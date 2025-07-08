@@ -76,7 +76,7 @@ void Character::processInput() {
         velocity.setY(velocity.y() - 4);
     } 
     if (!onGround) {
-        velocity.setY(Character::velocity.y() + 1);
+        velocity.setY(Character::velocity.y() + 0.1);
     } else if (!jumpDown) {
         velocity.setY(0);
     }
