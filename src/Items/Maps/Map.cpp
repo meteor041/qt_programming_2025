@@ -39,7 +39,7 @@ Platform* Map::getGroundPlatform(const QPointF& position,
         //       2. 角色的位置是否在平台的上方 (position.y() <= platformRect.top())
         if (position.x() >= platformRect.left() &&
             position.x() <= platformRect.right() &&
-            position.y() >= platformRect.top() - characterHeight) {
+            position.y() + characterHeight == platformRect.top() ) {
             qDebug() << position.y() << ", " << platformRect.top();
             // 如果找到一个符合条件的平台，我们还要判断它是不是“最高”的那个
             // （在屏幕坐标系中，Y值越小越靠上）

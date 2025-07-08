@@ -58,7 +58,7 @@ void BattleScene::processPhysics() {
     Platform* ground = map->getGroundPlatform(character->pos(), character->boundingRect().height());
 
     bool onGround = (ground != nullptr);
-    qDebug() << "onGround: " << onGround;
+    // qDebug() << "onGround: " << onGround;
     character->setOnGround(onGround);
     // if (ground == nullptr && !character->getJumpDown()) { // 如果脚下没有平台，说明在空中
     //     // 增加向下的速度
@@ -99,47 +99,50 @@ void BattleScene::processMovement() {
 
         // 平台碰撞检测：检查角色是否会穿过平台
         if (map) {
-            // 获取角色当前位置下方的平台
-            Platform* currentGround = map->getGroundPlatform(character->pos(), charRect.height());
-            // 获取角色新位置下方的平台
-            Platform* newGround = map->getGroundPlatform(newPos, charRect.height());
-            
-            // 1. 底部碰撞检测（角色下落撞到平台顶部）
-            if (newGround != nullptr) {
-                qreal platformSurfaceY = newGround->getSurfaceY();
-                qreal characterBottomY = newPos.y() + charRect.height();
-                
-                // 如果角色正在下落且会穿过平台表面
-                if (character->getVelocity().y() > 0 && characterBottomY > platformSurfaceY) {
-                    // 将角色位置限制在平台表面上方
-                    newPos.setY(platformSurfaceY - charRect.height());
-                    // 停止垂直速度（着陆）
-                    character->setVelocity(QPointF(character->getVelocity().x(), 0));
-                }
-            }
-            
-            // 2. 头部碰撞检测（角色向上跳跃撞到平台底部）
-            // 遍历所有平台，检查是否有平台在角色上方
+            // 直接遍历所有平台进行碰撞检测
             for (Platform* platform : map->getPlatforms()) {
                 QRectF platformRect = platform->sceneBoundingRect();
-                qreal characterTopY = newPos.y();
-                qreal platformBottomY = platformRect.bottom();
+                
+                // 计算角色当前和新位置的边界框
+                QRectF currentCharRect(character->pos(), charRect.size());
+                QRectF newCharRect(newPos, charRect.size());
                 
                 // 检查水平范围是否重叠
-                bool horizontalOverlap = (newPos.x() < platformRect.right() && 
-                                         newPos.x() + charRect.width() > platformRect.left());
+                bool horizontalOverlap = (newCharRect.right() > platformRect.left() && 
+                                         newCharRect.left() < platformRect.right());
                 
-                // 如果角色正在向上移动且头部会撞到平台底部
-                if (horizontalOverlap && 
-                    character->getVelocity().y() < 0 && 
-                    characterTopY < platformBottomY && 
-                    characterTopY > platformRect.top()) {
+                if (horizontalOverlap) {
+                    // 1. 底部碰撞检测（角色下落撞到平台顶部）
+                    if (character->getVelocity().y() > 0) { // 角色正在下落
+                        qreal currentBottom = currentCharRect.bottom();
+                        qreal newBottom = newCharRect.bottom();
+                        qreal platformTop = platformRect.top();
+                        
+                        // 检查是否从平台上方穿过平台顶部
+                        if (currentBottom <= platformTop && newBottom > platformTop) {
+                            // 将角色位置限制在平台表面上方
+                            newPos.setY(platformTop - charRect.height());
+                            // 停止垂直速度（着陆）
+                            character->setVelocity(QPointF(character->getVelocity().x(), 0));
+                            break; // 找到碰撞就停止检查其他平台
+                        }
+                    }
                     
-                    // 将角色位置限制在平台底部下方
-                    newPos.setY(platformBottomY);
-                    // 反转Y轴速度（向下弹回）
-                    character->setVelocity(QPointF(character->getVelocity().x(), -character->getVelocity().y()));
-                    break; // 找到第一个碰撞的平台就停止检查
+                    // 2. 头部碰撞检测（角色向上跳跃撞到平台底部）
+                    else if (character->getVelocity().y() < 0) { // 角色正在上升
+                        qreal currentTop = currentCharRect.top();
+                        qreal newTop = newCharRect.top();
+                        qreal platformBottom = platformRect.bottom();
+                        
+                        // 检查是否从平台下方撞到平台底部
+                        if (currentTop >= platformBottom && newTop < platformBottom) {
+                            // 将角色位置限制在平台底部下方
+                            newPos.setY(platformBottom);
+                            // 反转Y轴速度（向下弹回）
+                            character->setVelocity(QPointF(character->getVelocity().x(), -character->getVelocity().y()));
+                            break; // 找到碰撞就停止检查其他平台
+                        }
+                    }
                 }
             }
         }

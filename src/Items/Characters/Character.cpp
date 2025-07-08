@@ -64,6 +64,12 @@ void Character::setVelocity(const QPointF &velocity) {
 void Character::processInput() {
     auto velocity = QPointF(0, 0);
     const auto moveSpeed = 0.3;
+    
+    // 更新跳跃冷却计时器
+    if (jumpCooldownTimer > 0) {
+        jumpCooldownTimer--;
+    }
+    
     if (isLeftDown()) {
         velocity.setX(velocity.x() - moveSpeed);
         setTransform(QTransform().scale(1, 1));
@@ -71,19 +77,29 @@ void Character::processInput() {
         velocity.setX(velocity.x() + moveSpeed);
         setTransform(QTransform().scale(-1, 1));
     }
-    if (jumpDown) {
+    
+    // 跳跃逻辑：只有在地面上且冷却时间结束时才能跳跃
+    if (jumpDown && onGround && jumpCooldownTimer <= 0) {
         velocity.setX(Character::velocity.x()); // 左右速度不变
         velocity.setY(velocity.y() - 4);
-    } 
-    if (!onGround) {
-        velocity.setY(Character::velocity.y() + 0.1);
-    } else if (!jumpDown) {
+        // 开始跳跃冷却计时
+        jumpCooldownTimer = JUMP_COOLDOWN_FRAMES;
+        qDebug() << "Jump executed, cooldown started for" << JUMP_COOLDOWN_FRAMES << "frames";
+    } else if (!onGround) {
+        velocity.setY(Character::velocity.y() + 0.5);
+    } else if (!jumpDown || jumpCooldownTimer > 0) {
+        // 如果不在跳跃状态或者在冷却期间，垂直速度为0
         velocity.setY(0);
     }
+    
     setVelocity(velocity);
 
     // 调试输出
     qDebug() << "Character velocity:" << velocity;
+    if (jumpCooldownTimer > 0) {
+        qDebug() << "Jump cooldown remaining:" << jumpCooldownTimer << "frames";
+    }
+    
     if (!lastPickDown && pickDown) { // first time pickDown
         picking = true;
     } else {

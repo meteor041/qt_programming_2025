@@ -54,6 +54,10 @@ private:
     bool leftDown{}, rightDown{}, pickDown{}, jumpDown{}, onGround{};
     bool lastPickDown{};
     bool picking{};
+    
+    // 跳跃计时器相关变量
+    int jumpCooldownTimer{0};        // 跳跃冷却计时器
+    static const int JUMP_COOLDOWN_FRAMES = 30; // 跳跃冷却帧数（约0.33秒，假设90FPS）
 };
 
 
