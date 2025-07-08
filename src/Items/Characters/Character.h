@@ -35,8 +35,14 @@ public:
     void processInput();
 
     Armor* pickupArmor(Armor* newArmor);
+    void takeDamage(int damage);
+    [[nodiscard]] int getAttackPower() const;
 
 protected:
+    int health;
+    int maxHealth;
+    int baseAtk;
+
     HeadEquipment *headEquipment{};
     LegEquipment *legEquipment{};
     Armor *armor{};

@@ -22,6 +22,8 @@ public:
 
     void processPicking() override;
 
+    void processCombat(); // 新增战斗处理函数
+
 protected slots:
 
     void update() override;
@@ -39,6 +41,7 @@ private:
 
     Map *map;
     Character *character;
+    Character *enemy; // 添加敌人角色
     Armor *spareArmor;
 };
 

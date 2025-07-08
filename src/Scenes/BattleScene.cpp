@@ -47,6 +47,11 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
                 character->setPickDown(true);
             }
             break;
+        case Qt::Key_K: // 新增攻击按键
+            if (character != nullptr) {
+                character->setAttackDown(true);
+            }
+            break;
         default:
             Scene::keyPressEvent(event);
     }
@@ -69,6 +74,11 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
                 character->setPickDown(false);
             }
             break;
+        case Qt::Key_K: // 新增攻击按键
+            if (character != nullptr) {
+                character->setAttackDown(false);
+            }
+            break;
         default:
             Scene::keyReleaseEvent(event);
     }
@@ -76,6 +86,25 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
 
 void BattleScene::update() {
     Scene::update();
+    processCombat(); // 在主循环中调用
+}
+
+void BattleScene::processCombat() {
+    if (character->isAttacking()) {
+        // 使用 collidesWithItem() 进行碰撞检测
+        if (character->collidesWithItem(enemy)) {
+            qDebug() << "Hit!";
+            enemy->takeDamage(character->getAttackPower());
+            // 可以添加击退效果等
+            if (enemy->health <= 0) {
+                qDebug() << "Enemy defeated!";
+                removeItem(enemy);
+                // delete enemy; // 注意内存管理
+                enemy = nullptr;
+            }
+        }
+    }
+    // 这里可以添加敌人的攻击逻辑
 }
 
 void BattleScene::processMovement() {
