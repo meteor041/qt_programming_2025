@@ -70,6 +70,7 @@ include CMakeFiles/qt_programming_2024.dir/flags.make
 
 qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp: E:/Qt/assistant_work/qt-programming-2025/res/res.qrc
 qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp: CMakeFiles/qt_programming_2024_autogen.dir/AutoRcc_res_PNK5WDWK6L_Info.json
+qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp: E:/Qt/assistant_work/qt-programming-2025/res/Biker_basic.png
 qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp: E:/Qt/assistant_work/qt-programming-2025/res/platform1.png
 qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp: E:/Qt/assistant_work/qt-programming-2025/res/platform2.png
 qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp: E:/Qt/assistant_work/qt-programming-2025/res/MapBG2.png

@@ -293,11 +293,11 @@
 	"dependencies" : 
 	[
 		{
-			"id" : "qt_programming_2024_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
-		},
-		{
 			"backtrace" : 0,
 			"id" : "qt_programming_2024_autogen::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "qt_programming_2024_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "qt_programming_2024::@6890427a1f51a3e7e1df",
