@@ -47,9 +47,10 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Items/Mountable.h
         src/Items/Armors/FlamebreakerArmor.cpp
         src/Items/Armors/FlamebreakerArmor.h
-        src/Items/Maps/platform/Platform.cpp src/Items/Maps/platform/Platform.h
-        src/Items/Maps/platform/Earthplatform.h
-        src/Items/Maps/platform/Earthplatform.cpp
+        src/Items/Maps/platform/Platform.cpp 
+        src/Items/Maps/platform/Platform.h
+        src/Items/Maps/platform/EarthPlatform.h
+        src/Items/Maps/platform/EarthPlatform.cpp
         src/Items/Maps/platform/GrassPlatform.h
         src/Items/Maps/platform/GrassPlatform.cpp
         src/Items/Maps/platform/IcePlatform.h
@@ -61,4 +62,3 @@ target_link_libraries(qt_programming_2024
         Qt::Gui
         Qt::Widgets
 )
-
