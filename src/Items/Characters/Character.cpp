@@ -64,6 +64,7 @@ void Character::processInput() {
         setTransform(QTransform().scale(-1, 1));
     }
     if (jumpDown) {
+        velocity.setX(Character::velocity.x()); // 左右速度不变
         velocity.setY(velocity.y() - 80);
     }
     setVelocity(velocity);
