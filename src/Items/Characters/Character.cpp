@@ -73,7 +73,7 @@ void Character::processInput() {
     }
     if (jumpDown) {
         velocity.setX(Character::velocity.x()); // 左右速度不变
-        velocity.setY(velocity.y() - 8);
+        velocity.setY(velocity.y() - 4);
     } 
     if (!onGround) {
         velocity.setY(Character::velocity.y() + 1);

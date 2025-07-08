@@ -24,6 +24,9 @@ public:
     // const 保证这个函数不会修改Map的状态
     Platform* getGroundPlatform(const QPointF& position, qreal characterHeight = 50.0) const;
 
+    // 新增函数：获取所有平台的列表
+    const QList<Platform*>& getPlatforms() const;
+
     // 【移除】这个函数的功能已经被 getGroundPlatform 替代，不再需要
     // virtual qreal getFloorHeight();
 
