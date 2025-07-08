@@ -1,0 +1,14 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+    <!--
+      在这里把你 res 文件夹下的图片文件名列出来。
+      你需要把下面的 "你的第一张图片.png" 和 "你的第二张图片.png"
+      替换成你那两张图片的真实文件名！
+    -->
+    <file>MapBG1.png</file>
+    <file>MapBG2.png</file>
+    <file>platform1.png</file>
+    <file>platform2.png</file>
+    <file>platform3.png</file>
+</qresource>
+</RCC>
