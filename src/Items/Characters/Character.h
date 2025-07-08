@@ -22,11 +22,11 @@ public:
 
     void setRightDown(bool rightDown);
 
-    [[nodescard]] bool isJumpDown() const;
+    [[nodiscard]] bool isJumpDown() const;
 
     void setJumpDown(bool jumpDown);
 
-    [[nodescard]] bool isOnGround() const;
+    [[nodiscard]] bool isOnGround() const;
 
     void setOnGround(bool onGround);
 
