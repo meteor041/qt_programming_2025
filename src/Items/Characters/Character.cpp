@@ -5,11 +5,11 @@
 #include <QTransform>
 #include "Character.h"
 
-Character::Character(QGraphicsItem *parent) : Item(parent, "") {
-//    ellipseItem = new QGraphicsEllipseItem(-5, -5, 10, 10, this);
-//    // Optionally, set some properties of the ellipse
-//    ellipseItem->setBrush(Qt::green);          // Fill color
-//    ellipseItem->setZValue(1);
+Character::Character(QGraphicsItem *parent) : Item(parent, ":/Biker_basic.png") {
+   ellipseItem = new QGraphicsEllipseItem(-5, -5, 10, 10, this);
+   // Optionally, set some properties of the ellipse
+   ellipseItem->setBrush(Qt::green);          // Fill color
+   ellipseItem->setZValue(1);
 }
 
 bool Character::isLeftDown() const {

@@ -22,6 +22,8 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     // 创建角色
     character = new Link();
     addItem(character);
+    character->setScale(2.0);
+    character->setZValue(10);
     // 使用新的getSpawnPos，它会基于平台位置来决定出生点
     character->setPos(map->getSpawnPos());
 

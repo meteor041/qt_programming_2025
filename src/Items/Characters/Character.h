@@ -41,7 +41,7 @@ protected:
     LegEquipment *legEquipment{};
     Armor *armor{};
     QPointF velocity{};
-//    QGraphicsEllipseItem *ellipseItem; // for debugging
+   QGraphicsEllipseItem *ellipseItem; // for debugging
 private:
     bool leftDown{}, rightDown{}, pickDown{};
     bool lastPickDown{};
