@@ -4,6 +4,7 @@
 
 #include "Item.h"
 
+//传路径参数
 Item::Item(QGraphicsItem *parent, const QString &pixmapPath) : QGraphicsItem(parent) {
     if (pixmapPath != "") {
         pixmapItem = new QGraphicsPixmapItem(QPixmap(pixmapPath), this);
