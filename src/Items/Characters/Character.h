@@ -26,6 +26,10 @@ public:
 
     void setJumpDown(bool jumpDown);
 
+    [[nodescard]] bool isOnGround() const;
+
+    void setOnGround(bool onGround);
+
     [[nodiscard]] bool isPickDown() const;
 
     void setPickDown(bool pickDown);
@@ -47,7 +51,7 @@ protected:
     QPointF velocity{};
    QGraphicsEllipseItem *ellipseItem; // for debugging
 private:
-    bool leftDown{}, rightDown{}, pickDown{}, jumpDown{};
+    bool leftDown{}, rightDown{}, pickDown{}, jumpDown{}, onGround{};
     bool lastPickDown{};
     bool picking{};
 };

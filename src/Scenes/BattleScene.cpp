@@ -52,26 +52,30 @@ void BattleScene::processPhysics() {
         return;
     }
 
-    const qreal GRAVITY = 2000.0; // 定义一个重力加速度（像素/秒^2）
+    // const qreal GRAVITY = 2000.0; // 定义一个重力加速度（像素/秒^2）
 
-    // 1. 对角色施加重力 (除非它在地面上)
+    // // 1. 对角色施加重力 (除非它在地面上)
     Platform* ground = map->getGroundPlatform(character->pos());
 
-    if (ground == nullptr) { // 如果脚下没有平台，说明在空中
-        // 增加向下的速度
-        //还没写 character->addVelocity(0, GRAVITY * (deltaTime / 1000.0));
-    } else { // 如果脚下有平台
-        qreal footY = character->sceneBoundingRect().bottom();
-        qreal surfaceY = ground->getSurfaceY();
+    bool onGround = (ground != nullptr);
+    qDebug() << "onGround: " << onGround;
+    character->setOnGround(onGround);
+    // if (ground == nullptr && !character->getJumpDown()) { // 如果脚下没有平台，说明在空中
+    //     // 增加向下的速度
+    //     //还没写 character->addVelocity(0, GRAVITY * (deltaTime / 1000.0));
+    //     character->velocity.setY(character->velocity.y() + GRAVITY * (deltaTime / 1000.0));
+    // } else { // 如果脚下有平台
+    //     qreal footY = character->sceneBoundingRect().bottom();
+    //     qreal surfaceY = ground->getSurfaceY();
 
-        // 检查是否正在下落并且已经接触或穿过平台
-        if (footY >= surfaceY && character->getVelocity().y() > 0) {
-            // 将角色“吸附”在平台表面
-            character->setY(surfaceY - character->boundingRect().height());
-            // 垂直速度清零，停止下落
-        //还没写    character->setVelocity(character->getVelocity().x(), 0);
-        }
-    }
+    //     // 检查是否正在下落并且已经接触或穿过平台
+    //     if (footY >= surfaceY && character->getVelocity().y() > 0) {
+    //         // 将角色“吸附”在平台表面
+    //         character->setY(surfaceY - character->boundingRect().height());
+    //         // 垂直速度清零，停止下落
+    //     //还没写    character->setVelocity(character->getVelocity().x(), 0);
+    //     }
+    // }
 }
 
 
@@ -90,7 +94,8 @@ void BattleScene::processMovement() {
 
         // 应用边界限制
         newPos.setX(qBound(0.0, newPos.x(), bounds.width() - charRect.width()));
-        newPos.setY(qBound(0.0, newPos.y(), bounds.height() - charRect.height()));
+        // 修改Y轴限制：不允许进入画面最下方120像素的区域
+        newPos.setY(qBound(0.0, newPos.y(), bounds.height() - charRect.height() - 120.0));
 
         character->setPos(newPos);
     }
