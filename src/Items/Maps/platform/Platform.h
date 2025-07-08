@@ -1,14 +1,12 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#include <QGraphicsPixmapItem>
+#include <QGraphicsItem>
+#include <QPixmap>
 
 // 前向声明
 class Character;
 
-// 不再继承 QGraphicsRectItem，而是继承我们自己的 Item 基类，因为它已经处理了图片显示
-// 或者，如果不想引入 Item，我们可以直接继承 QGraphicsItem 并自己管理 pixmap
-// 这里我们选择后者，让 Platform 保持独立
 class Platform : public QGraphicsItem {
 public:
     // 构造函数现在接收一个贴图路径
@@ -28,10 +26,9 @@ public:
     virtual void onCharacterLeave(Character* character);
 
 protected:
-    QGraphicsPixmapItem* m_pixmapItem; // 用于显示平台的图片
-
-private:
-    qreal m_originalWidth;
+    QPixmap m_pixmap;        // 原始图片
+    qreal m_originalWidth;   // 原始图片宽度
+    qreal m_currentWidth;    // 当前平台宽度
 };
 
 #endif // PLATFORM_H

@@ -2,42 +2,61 @@
 
 #include "Platform.h"
 #include <QTransform> // 需要包含 QTransform 头文件
+#include <QPainter>
 
 Platform::Platform(const QString& pixmapPath, QGraphicsItem *parent) : QGraphicsItem(parent) {
-    m_pixmapItem = new QGraphicsPixmapItem(QPixmap(pixmapPath), this);
-
-    // 【核心改动】在构造函数中，记录下图片的原始宽度
-    m_originalWidth = m_pixmapItem->boundingRect().width();
+    m_pixmap = QPixmap(pixmapPath);
+    
+    // 【核心改动】记录原始图片和默认宽度
+    m_originalWidth = m_pixmap.width();
+    m_currentWidth = m_originalWidth; // 默认宽度为原始宽度
 }
 
-// 【核心改动】实现设置视觉宽度的方法
+// 【核心改动】实现设置视觉宽度的方法 - 改为复制排列
 void Platform::setVisualWidth(qreal width) {
-    // 如果原始宽度有效，则进行计算
-    if (m_originalWidth > 0) {
-        // 计算X方向的缩放比例
-        qreal scaleX = width / m_originalWidth;
-
-        // 创建一个只在X方向缩放的变换矩阵
-        // Y方向的缩放比例为 1.0，表示不改变高度
-        QTransform transform;
-        transform.scale(scaleX, 1.0);
-
-        // 将此变换应用到整个Platform对象上
-        setTransform(transform);
+    if (width > 0) {
+        m_currentWidth = width;
+        // 不再使用变换，而是在paint函数中处理复制排列
+        update(); // 触发重绘
     }
 }
 
-// getSurfaceY, boundingRect, paint 等其他函数保持不变
+// getSurfaceY 保持不变
 qreal Platform::getSurfaceY() const {
     return sceneBoundingRect().top();
 }
 
+// 【核心改动】修改boundingRect以反映当前宽度
 QRectF Platform::boundingRect() const {
-    return m_pixmapItem->boundingRect();
+    return QRectF(0, 0, m_currentWidth, m_pixmap.height());
 }
 
+// 【核心改动】实现复制排列的绘制逻辑
 void Platform::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    // 无需绘制
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+    
+    if (m_pixmap.isNull()) {
+        return;
+    }
+    
+    // 计算需要绘制多少个完整的图片
+    int fullTiles = static_cast<int>(m_currentWidth / m_originalWidth);
+    qreal remainingWidth = m_currentWidth - (fullTiles * m_originalWidth);
+    
+    // 绘制完整的图片瓦片
+    for (int i = 0; i < fullTiles; ++i) {
+        qreal x = i * m_originalWidth;
+        painter->drawPixmap(x, 0, m_pixmap);
+    }
+    
+    // 如果有剩余宽度，绘制部分图片
+    if (remainingWidth > 0) {
+        qreal x = fullTiles * m_originalWidth;
+        QRect sourceRect(0, 0, static_cast<int>(remainingWidth), m_pixmap.height());
+        QRect targetRect(static_cast<int>(x), 0, static_cast<int>(remainingWidth), m_pixmap.height());
+        painter->drawPixmap(targetRect, m_pixmap, sourceRect);
+    }
 }
 
 void Platform::onCharacterEnter(Character* character) {}
