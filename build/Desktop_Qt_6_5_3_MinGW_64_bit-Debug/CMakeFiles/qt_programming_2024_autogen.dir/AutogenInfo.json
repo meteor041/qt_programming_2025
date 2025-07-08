@@ -250,13 +250,136 @@
 		"F:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/QtPublicToolHelpers.cmake",
 		"F:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/QtPublicCMakeHelpers.cmake",
 		"F:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
-		"F:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/Qt6Dependencies.cmake"
+		"F:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/Qt6Dependencies.cmake",
+		"E:/Qt/assistant_work/qt-programming-2025/res/res.qrc"
 	],
 	"CMAKE_SOURCE_DIR" : "E:/Qt/assistant_work/qt-programming-2025",
 	"CROSS_CONFIG" : false,
 	"DEP_FILE" : "E:/Qt/assistant_work/qt-programming-2025/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/qt_programming_2024_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "qt_programming_2024_autogen/timestamp",
-	"HEADERS" : [],
+	"HEADERS" : 
+	[
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/Armor.h",
+			"MU",
+			"XAWFG2TZKF/moc_Armor.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/FlamebreakerArmor.h",
+			"MU",
+			"XAWFG2TZKF/moc_FlamebreakerArmor.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/OldShirt.h",
+			"MU",
+			"XAWFG2TZKF/moc_OldShirt.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Characters/Character.h",
+			"MU",
+			"KRBJEFP6ZJ/moc_Character.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Characters/Link.h",
+			"MU",
+			"KRBJEFP6ZJ/moc_Link.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/HeadEquipments/CapOfTheHero.h",
+			"MU",
+			"6DSFGWXEQO/moc_CapOfTheHero.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/HeadEquipments/HeadEquipment.h",
+			"MU",
+			"6DSFGWXEQO/moc_HeadEquipment.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Item.h",
+			"MU",
+			"7O23G427QC/moc_Item.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/LegEquipments/LegEquipment.h",
+			"MU",
+			"QOAUGX27LX/moc_LegEquipment.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/LegEquipments/WellWornTrousers.h",
+			"MU",
+			"QOAUGX27LX/moc_WellWornTrousers.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/Battlefield.h",
+			"MU",
+			"XUOAT7XU3M/moc_Battlefield.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/Map.h",
+			"MU",
+			"XUOAT7XU3M/moc_Map.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/Earthplatform.h",
+			"MU",
+			"NXIKWWTEQ7/moc_Earthplatform.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/GrassPlatform.h",
+			"MU",
+			"NXIKWWTEQ7/moc_GrassPlatform.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/IcePlatform.h",
+			"MU",
+			"NXIKWWTEQ7/moc_IcePlatform.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/platform.h",
+			"MU",
+			"NXIKWWTEQ7/moc_platform.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Mountable.h",
+			"MU",
+			"7O23G427QC/moc_Mountable.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/MyGame.h",
+			"MU",
+			"UVLADIE3JM/moc_MyGame.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Scenes/BattleScene.h",
+			"MU",
+			"SNE2VJ5FQV/moc_BattleScene.cpp",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Scenes/Scene.h",
+			"MU",
+			"SNE2VJ5FQV/moc_Scene.cpp",
+			null
+		]
+	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "E:/Qt/assistant_work/qt-programming-2025/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/qt_programming_2024_autogen/include",
 	"MOC_COMPILATION_FILE" : "E:/Qt/assistant_work/qt-programming-2025/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/qt_programming_2024_autogen/mocs_compilation.cpp",
@@ -323,7 +446,106 @@
 	"QT_VERSION_MAJOR" : 6,
 	"QT_VERSION_MINOR" : 5,
 	"SETTINGS_FILE" : "E:/Qt/assistant_work/qt-programming-2025/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/qt_programming_2024_autogen.dir/AutogenUsed.txt",
-	"SOURCES" : [],
+	"SOURCES" : 
+	[
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/Armor.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/FlamebreakerArmor.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/OldShirt.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Characters/Character.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Characters/Link.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/HeadEquipments/CapOfTheHero.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/HeadEquipments/HeadEquipment.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Item.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/LegEquipments/LegEquipment.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/LegEquipments/WellWornTrousers.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/Battlefield.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/Map.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/Earthplatform.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/GrassPlatform.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/IcePlatform.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/platform.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Items/Mountable.cpp",
+			"MU",
+			null
+		],
+		[ "E:/Qt/assistant_work/qt-programming-2025/src/MyGame.cpp", "MU", null ],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Scenes/BattleScene.cpp",
+			"MU",
+			null
+		],
+		[
+			"E:/Qt/assistant_work/qt-programming-2025/src/Scenes/Scene.cpp",
+			"MU",
+			null
+		],
+		[ "E:/Qt/assistant_work/qt-programming-2025/src/main.cpp", "MU", null ]
+	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],
 	"UIC_SKIP" : [],

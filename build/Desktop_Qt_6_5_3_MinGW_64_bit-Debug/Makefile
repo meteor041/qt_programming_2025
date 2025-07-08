@@ -154,6 +154,30 @@ qt_programming_2024_autogen/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024_autogen.dir\build.make CMakeFiles/qt_programming_2024_autogen.dir/build
 .PHONY : qt_programming_2024_autogen/fast
 
+qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.obj: qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.obj
+.PHONY : qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.obj
+
+# target to build an object file
+qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.obj
+.PHONY : qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.obj
+
+qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.i: qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.i
+.PHONY : qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.i
+
+# target to preprocess a source file
+qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.i
+.PHONY : qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.i
+
+qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.s: qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.s
+.PHONY : qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.s
+
+# target to generate assembly for a file
+qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.s
+.PHONY : qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.cpp.s
+
 qt_programming_2024_autogen/mocs_compilation.obj: qt_programming_2024_autogen/mocs_compilation.cpp.obj
 .PHONY : qt_programming_2024_autogen/mocs_compilation.obj
 
@@ -178,6 +202,510 @@ qt_programming_2024_autogen/mocs_compilation.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/qt_programming_2024_autogen/mocs_compilation.cpp.s
 .PHONY : qt_programming_2024_autogen/mocs_compilation.cpp.s
 
+src/Items/Armors/Armor.obj: src/Items/Armors/Armor.cpp.obj
+.PHONY : src/Items/Armors/Armor.obj
+
+# target to build an object file
+src/Items/Armors/Armor.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/Armor.cpp.obj
+.PHONY : src/Items/Armors/Armor.cpp.obj
+
+src/Items/Armors/Armor.i: src/Items/Armors/Armor.cpp.i
+.PHONY : src/Items/Armors/Armor.i
+
+# target to preprocess a source file
+src/Items/Armors/Armor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/Armor.cpp.i
+.PHONY : src/Items/Armors/Armor.cpp.i
+
+src/Items/Armors/Armor.s: src/Items/Armors/Armor.cpp.s
+.PHONY : src/Items/Armors/Armor.s
+
+# target to generate assembly for a file
+src/Items/Armors/Armor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/Armor.cpp.s
+.PHONY : src/Items/Armors/Armor.cpp.s
+
+src/Items/Armors/FlamebreakerArmor.obj: src/Items/Armors/FlamebreakerArmor.cpp.obj
+.PHONY : src/Items/Armors/FlamebreakerArmor.obj
+
+# target to build an object file
+src/Items/Armors/FlamebreakerArmor.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/FlamebreakerArmor.cpp.obj
+.PHONY : src/Items/Armors/FlamebreakerArmor.cpp.obj
+
+src/Items/Armors/FlamebreakerArmor.i: src/Items/Armors/FlamebreakerArmor.cpp.i
+.PHONY : src/Items/Armors/FlamebreakerArmor.i
+
+# target to preprocess a source file
+src/Items/Armors/FlamebreakerArmor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/FlamebreakerArmor.cpp.i
+.PHONY : src/Items/Armors/FlamebreakerArmor.cpp.i
+
+src/Items/Armors/FlamebreakerArmor.s: src/Items/Armors/FlamebreakerArmor.cpp.s
+.PHONY : src/Items/Armors/FlamebreakerArmor.s
+
+# target to generate assembly for a file
+src/Items/Armors/FlamebreakerArmor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/FlamebreakerArmor.cpp.s
+.PHONY : src/Items/Armors/FlamebreakerArmor.cpp.s
+
+src/Items/Armors/OldShirt.obj: src/Items/Armors/OldShirt.cpp.obj
+.PHONY : src/Items/Armors/OldShirt.obj
+
+# target to build an object file
+src/Items/Armors/OldShirt.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/OldShirt.cpp.obj
+.PHONY : src/Items/Armors/OldShirt.cpp.obj
+
+src/Items/Armors/OldShirt.i: src/Items/Armors/OldShirt.cpp.i
+.PHONY : src/Items/Armors/OldShirt.i
+
+# target to preprocess a source file
+src/Items/Armors/OldShirt.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/OldShirt.cpp.i
+.PHONY : src/Items/Armors/OldShirt.cpp.i
+
+src/Items/Armors/OldShirt.s: src/Items/Armors/OldShirt.cpp.s
+.PHONY : src/Items/Armors/OldShirt.s
+
+# target to generate assembly for a file
+src/Items/Armors/OldShirt.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Armors/OldShirt.cpp.s
+.PHONY : src/Items/Armors/OldShirt.cpp.s
+
+src/Items/Characters/Character.obj: src/Items/Characters/Character.cpp.obj
+.PHONY : src/Items/Characters/Character.obj
+
+# target to build an object file
+src/Items/Characters/Character.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Characters/Character.cpp.obj
+.PHONY : src/Items/Characters/Character.cpp.obj
+
+src/Items/Characters/Character.i: src/Items/Characters/Character.cpp.i
+.PHONY : src/Items/Characters/Character.i
+
+# target to preprocess a source file
+src/Items/Characters/Character.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Characters/Character.cpp.i
+.PHONY : src/Items/Characters/Character.cpp.i
+
+src/Items/Characters/Character.s: src/Items/Characters/Character.cpp.s
+.PHONY : src/Items/Characters/Character.s
+
+# target to generate assembly for a file
+src/Items/Characters/Character.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Characters/Character.cpp.s
+.PHONY : src/Items/Characters/Character.cpp.s
+
+src/Items/Characters/Link.obj: src/Items/Characters/Link.cpp.obj
+.PHONY : src/Items/Characters/Link.obj
+
+# target to build an object file
+src/Items/Characters/Link.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Characters/Link.cpp.obj
+.PHONY : src/Items/Characters/Link.cpp.obj
+
+src/Items/Characters/Link.i: src/Items/Characters/Link.cpp.i
+.PHONY : src/Items/Characters/Link.i
+
+# target to preprocess a source file
+src/Items/Characters/Link.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Characters/Link.cpp.i
+.PHONY : src/Items/Characters/Link.cpp.i
+
+src/Items/Characters/Link.s: src/Items/Characters/Link.cpp.s
+.PHONY : src/Items/Characters/Link.s
+
+# target to generate assembly for a file
+src/Items/Characters/Link.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Characters/Link.cpp.s
+.PHONY : src/Items/Characters/Link.cpp.s
+
+src/Items/HeadEquipments/CapOfTheHero.obj: src/Items/HeadEquipments/CapOfTheHero.cpp.obj
+.PHONY : src/Items/HeadEquipments/CapOfTheHero.obj
+
+# target to build an object file
+src/Items/HeadEquipments/CapOfTheHero.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/HeadEquipments/CapOfTheHero.cpp.obj
+.PHONY : src/Items/HeadEquipments/CapOfTheHero.cpp.obj
+
+src/Items/HeadEquipments/CapOfTheHero.i: src/Items/HeadEquipments/CapOfTheHero.cpp.i
+.PHONY : src/Items/HeadEquipments/CapOfTheHero.i
+
+# target to preprocess a source file
+src/Items/HeadEquipments/CapOfTheHero.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/HeadEquipments/CapOfTheHero.cpp.i
+.PHONY : src/Items/HeadEquipments/CapOfTheHero.cpp.i
+
+src/Items/HeadEquipments/CapOfTheHero.s: src/Items/HeadEquipments/CapOfTheHero.cpp.s
+.PHONY : src/Items/HeadEquipments/CapOfTheHero.s
+
+# target to generate assembly for a file
+src/Items/HeadEquipments/CapOfTheHero.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/HeadEquipments/CapOfTheHero.cpp.s
+.PHONY : src/Items/HeadEquipments/CapOfTheHero.cpp.s
+
+src/Items/HeadEquipments/HeadEquipment.obj: src/Items/HeadEquipments/HeadEquipment.cpp.obj
+.PHONY : src/Items/HeadEquipments/HeadEquipment.obj
+
+# target to build an object file
+src/Items/HeadEquipments/HeadEquipment.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/HeadEquipments/HeadEquipment.cpp.obj
+.PHONY : src/Items/HeadEquipments/HeadEquipment.cpp.obj
+
+src/Items/HeadEquipments/HeadEquipment.i: src/Items/HeadEquipments/HeadEquipment.cpp.i
+.PHONY : src/Items/HeadEquipments/HeadEquipment.i
+
+# target to preprocess a source file
+src/Items/HeadEquipments/HeadEquipment.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/HeadEquipments/HeadEquipment.cpp.i
+.PHONY : src/Items/HeadEquipments/HeadEquipment.cpp.i
+
+src/Items/HeadEquipments/HeadEquipment.s: src/Items/HeadEquipments/HeadEquipment.cpp.s
+.PHONY : src/Items/HeadEquipments/HeadEquipment.s
+
+# target to generate assembly for a file
+src/Items/HeadEquipments/HeadEquipment.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/HeadEquipments/HeadEquipment.cpp.s
+.PHONY : src/Items/HeadEquipments/HeadEquipment.cpp.s
+
+src/Items/Item.obj: src/Items/Item.cpp.obj
+.PHONY : src/Items/Item.obj
+
+# target to build an object file
+src/Items/Item.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Item.cpp.obj
+.PHONY : src/Items/Item.cpp.obj
+
+src/Items/Item.i: src/Items/Item.cpp.i
+.PHONY : src/Items/Item.i
+
+# target to preprocess a source file
+src/Items/Item.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Item.cpp.i
+.PHONY : src/Items/Item.cpp.i
+
+src/Items/Item.s: src/Items/Item.cpp.s
+.PHONY : src/Items/Item.s
+
+# target to generate assembly for a file
+src/Items/Item.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Item.cpp.s
+.PHONY : src/Items/Item.cpp.s
+
+src/Items/LegEquipments/LegEquipment.obj: src/Items/LegEquipments/LegEquipment.cpp.obj
+.PHONY : src/Items/LegEquipments/LegEquipment.obj
+
+# target to build an object file
+src/Items/LegEquipments/LegEquipment.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/LegEquipments/LegEquipment.cpp.obj
+.PHONY : src/Items/LegEquipments/LegEquipment.cpp.obj
+
+src/Items/LegEquipments/LegEquipment.i: src/Items/LegEquipments/LegEquipment.cpp.i
+.PHONY : src/Items/LegEquipments/LegEquipment.i
+
+# target to preprocess a source file
+src/Items/LegEquipments/LegEquipment.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/LegEquipments/LegEquipment.cpp.i
+.PHONY : src/Items/LegEquipments/LegEquipment.cpp.i
+
+src/Items/LegEquipments/LegEquipment.s: src/Items/LegEquipments/LegEquipment.cpp.s
+.PHONY : src/Items/LegEquipments/LegEquipment.s
+
+# target to generate assembly for a file
+src/Items/LegEquipments/LegEquipment.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/LegEquipments/LegEquipment.cpp.s
+.PHONY : src/Items/LegEquipments/LegEquipment.cpp.s
+
+src/Items/LegEquipments/WellWornTrousers.obj: src/Items/LegEquipments/WellWornTrousers.cpp.obj
+.PHONY : src/Items/LegEquipments/WellWornTrousers.obj
+
+# target to build an object file
+src/Items/LegEquipments/WellWornTrousers.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/LegEquipments/WellWornTrousers.cpp.obj
+.PHONY : src/Items/LegEquipments/WellWornTrousers.cpp.obj
+
+src/Items/LegEquipments/WellWornTrousers.i: src/Items/LegEquipments/WellWornTrousers.cpp.i
+.PHONY : src/Items/LegEquipments/WellWornTrousers.i
+
+# target to preprocess a source file
+src/Items/LegEquipments/WellWornTrousers.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/LegEquipments/WellWornTrousers.cpp.i
+.PHONY : src/Items/LegEquipments/WellWornTrousers.cpp.i
+
+src/Items/LegEquipments/WellWornTrousers.s: src/Items/LegEquipments/WellWornTrousers.cpp.s
+.PHONY : src/Items/LegEquipments/WellWornTrousers.s
+
+# target to generate assembly for a file
+src/Items/LegEquipments/WellWornTrousers.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/LegEquipments/WellWornTrousers.cpp.s
+.PHONY : src/Items/LegEquipments/WellWornTrousers.cpp.s
+
+src/Items/Maps/Battlefield.obj: src/Items/Maps/Battlefield.cpp.obj
+.PHONY : src/Items/Maps/Battlefield.obj
+
+# target to build an object file
+src/Items/Maps/Battlefield.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/Battlefield.cpp.obj
+.PHONY : src/Items/Maps/Battlefield.cpp.obj
+
+src/Items/Maps/Battlefield.i: src/Items/Maps/Battlefield.cpp.i
+.PHONY : src/Items/Maps/Battlefield.i
+
+# target to preprocess a source file
+src/Items/Maps/Battlefield.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/Battlefield.cpp.i
+.PHONY : src/Items/Maps/Battlefield.cpp.i
+
+src/Items/Maps/Battlefield.s: src/Items/Maps/Battlefield.cpp.s
+.PHONY : src/Items/Maps/Battlefield.s
+
+# target to generate assembly for a file
+src/Items/Maps/Battlefield.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/Battlefield.cpp.s
+.PHONY : src/Items/Maps/Battlefield.cpp.s
+
+src/Items/Maps/Map.obj: src/Items/Maps/Map.cpp.obj
+.PHONY : src/Items/Maps/Map.obj
+
+# target to build an object file
+src/Items/Maps/Map.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/Map.cpp.obj
+.PHONY : src/Items/Maps/Map.cpp.obj
+
+src/Items/Maps/Map.i: src/Items/Maps/Map.cpp.i
+.PHONY : src/Items/Maps/Map.i
+
+# target to preprocess a source file
+src/Items/Maps/Map.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/Map.cpp.i
+.PHONY : src/Items/Maps/Map.cpp.i
+
+src/Items/Maps/Map.s: src/Items/Maps/Map.cpp.s
+.PHONY : src/Items/Maps/Map.s
+
+# target to generate assembly for a file
+src/Items/Maps/Map.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/Map.cpp.s
+.PHONY : src/Items/Maps/Map.cpp.s
+
+src/Items/Maps/platform/Earthplatform.obj: src/Items/Maps/platform/Earthplatform.cpp.obj
+.PHONY : src/Items/Maps/platform/Earthplatform.obj
+
+# target to build an object file
+src/Items/Maps/platform/Earthplatform.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/Earthplatform.cpp.obj
+.PHONY : src/Items/Maps/platform/Earthplatform.cpp.obj
+
+src/Items/Maps/platform/Earthplatform.i: src/Items/Maps/platform/Earthplatform.cpp.i
+.PHONY : src/Items/Maps/platform/Earthplatform.i
+
+# target to preprocess a source file
+src/Items/Maps/platform/Earthplatform.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/Earthplatform.cpp.i
+.PHONY : src/Items/Maps/platform/Earthplatform.cpp.i
+
+src/Items/Maps/platform/Earthplatform.s: src/Items/Maps/platform/Earthplatform.cpp.s
+.PHONY : src/Items/Maps/platform/Earthplatform.s
+
+# target to generate assembly for a file
+src/Items/Maps/platform/Earthplatform.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/Earthplatform.cpp.s
+.PHONY : src/Items/Maps/platform/Earthplatform.cpp.s
+
+src/Items/Maps/platform/GrassPlatform.obj: src/Items/Maps/platform/GrassPlatform.cpp.obj
+.PHONY : src/Items/Maps/platform/GrassPlatform.obj
+
+# target to build an object file
+src/Items/Maps/platform/GrassPlatform.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/GrassPlatform.cpp.obj
+.PHONY : src/Items/Maps/platform/GrassPlatform.cpp.obj
+
+src/Items/Maps/platform/GrassPlatform.i: src/Items/Maps/platform/GrassPlatform.cpp.i
+.PHONY : src/Items/Maps/platform/GrassPlatform.i
+
+# target to preprocess a source file
+src/Items/Maps/platform/GrassPlatform.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/GrassPlatform.cpp.i
+.PHONY : src/Items/Maps/platform/GrassPlatform.cpp.i
+
+src/Items/Maps/platform/GrassPlatform.s: src/Items/Maps/platform/GrassPlatform.cpp.s
+.PHONY : src/Items/Maps/platform/GrassPlatform.s
+
+# target to generate assembly for a file
+src/Items/Maps/platform/GrassPlatform.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/GrassPlatform.cpp.s
+.PHONY : src/Items/Maps/platform/GrassPlatform.cpp.s
+
+src/Items/Maps/platform/IcePlatform.obj: src/Items/Maps/platform/IcePlatform.cpp.obj
+.PHONY : src/Items/Maps/platform/IcePlatform.obj
+
+# target to build an object file
+src/Items/Maps/platform/IcePlatform.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/IcePlatform.cpp.obj
+.PHONY : src/Items/Maps/platform/IcePlatform.cpp.obj
+
+src/Items/Maps/platform/IcePlatform.i: src/Items/Maps/platform/IcePlatform.cpp.i
+.PHONY : src/Items/Maps/platform/IcePlatform.i
+
+# target to preprocess a source file
+src/Items/Maps/platform/IcePlatform.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/IcePlatform.cpp.i
+.PHONY : src/Items/Maps/platform/IcePlatform.cpp.i
+
+src/Items/Maps/platform/IcePlatform.s: src/Items/Maps/platform/IcePlatform.cpp.s
+.PHONY : src/Items/Maps/platform/IcePlatform.s
+
+# target to generate assembly for a file
+src/Items/Maps/platform/IcePlatform.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/IcePlatform.cpp.s
+.PHONY : src/Items/Maps/platform/IcePlatform.cpp.s
+
+src/Items/Maps/platform/platform.obj: src/Items/Maps/platform/platform.cpp.obj
+.PHONY : src/Items/Maps/platform/platform.obj
+
+# target to build an object file
+src/Items/Maps/platform/platform.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/platform.cpp.obj
+.PHONY : src/Items/Maps/platform/platform.cpp.obj
+
+src/Items/Maps/platform/platform.i: src/Items/Maps/platform/platform.cpp.i
+.PHONY : src/Items/Maps/platform/platform.i
+
+# target to preprocess a source file
+src/Items/Maps/platform/platform.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/platform.cpp.i
+.PHONY : src/Items/Maps/platform/platform.cpp.i
+
+src/Items/Maps/platform/platform.s: src/Items/Maps/platform/platform.cpp.s
+.PHONY : src/Items/Maps/platform/platform.s
+
+# target to generate assembly for a file
+src/Items/Maps/platform/platform.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Maps/platform/platform.cpp.s
+.PHONY : src/Items/Maps/platform/platform.cpp.s
+
+src/Items/Mountable.obj: src/Items/Mountable.cpp.obj
+.PHONY : src/Items/Mountable.obj
+
+# target to build an object file
+src/Items/Mountable.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Mountable.cpp.obj
+.PHONY : src/Items/Mountable.cpp.obj
+
+src/Items/Mountable.i: src/Items/Mountable.cpp.i
+.PHONY : src/Items/Mountable.i
+
+# target to preprocess a source file
+src/Items/Mountable.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Mountable.cpp.i
+.PHONY : src/Items/Mountable.cpp.i
+
+src/Items/Mountable.s: src/Items/Mountable.cpp.s
+.PHONY : src/Items/Mountable.s
+
+# target to generate assembly for a file
+src/Items/Mountable.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Items/Mountable.cpp.s
+.PHONY : src/Items/Mountable.cpp.s
+
+src/MyGame.obj: src/MyGame.cpp.obj
+.PHONY : src/MyGame.obj
+
+# target to build an object file
+src/MyGame.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/MyGame.cpp.obj
+.PHONY : src/MyGame.cpp.obj
+
+src/MyGame.i: src/MyGame.cpp.i
+.PHONY : src/MyGame.i
+
+# target to preprocess a source file
+src/MyGame.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/MyGame.cpp.i
+.PHONY : src/MyGame.cpp.i
+
+src/MyGame.s: src/MyGame.cpp.s
+.PHONY : src/MyGame.s
+
+# target to generate assembly for a file
+src/MyGame.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/MyGame.cpp.s
+.PHONY : src/MyGame.cpp.s
+
+src/Scenes/BattleScene.obj: src/Scenes/BattleScene.cpp.obj
+.PHONY : src/Scenes/BattleScene.obj
+
+# target to build an object file
+src/Scenes/BattleScene.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Scenes/BattleScene.cpp.obj
+.PHONY : src/Scenes/BattleScene.cpp.obj
+
+src/Scenes/BattleScene.i: src/Scenes/BattleScene.cpp.i
+.PHONY : src/Scenes/BattleScene.i
+
+# target to preprocess a source file
+src/Scenes/BattleScene.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Scenes/BattleScene.cpp.i
+.PHONY : src/Scenes/BattleScene.cpp.i
+
+src/Scenes/BattleScene.s: src/Scenes/BattleScene.cpp.s
+.PHONY : src/Scenes/BattleScene.s
+
+# target to generate assembly for a file
+src/Scenes/BattleScene.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Scenes/BattleScene.cpp.s
+.PHONY : src/Scenes/BattleScene.cpp.s
+
+src/Scenes/Scene.obj: src/Scenes/Scene.cpp.obj
+.PHONY : src/Scenes/Scene.obj
+
+# target to build an object file
+src/Scenes/Scene.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Scenes/Scene.cpp.obj
+.PHONY : src/Scenes/Scene.cpp.obj
+
+src/Scenes/Scene.i: src/Scenes/Scene.cpp.i
+.PHONY : src/Scenes/Scene.i
+
+# target to preprocess a source file
+src/Scenes/Scene.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Scenes/Scene.cpp.i
+.PHONY : src/Scenes/Scene.cpp.i
+
+src/Scenes/Scene.s: src/Scenes/Scene.cpp.s
+.PHONY : src/Scenes/Scene.s
+
+# target to generate assembly for a file
+src/Scenes/Scene.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/Scenes/Scene.cpp.s
+.PHONY : src/Scenes/Scene.cpp.s
+
+src/main.obj: src/main.cpp.obj
+.PHONY : src/main.obj
+
+# target to build an object file
+src/main.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/main.cpp.obj
+.PHONY : src/main.cpp.obj
+
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
+
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\qt_programming_2024.dir\build.make CMakeFiles/qt_programming_2024.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -189,9 +717,75 @@ help:
 	@echo ... qt_programming_2024_autogen
 	@echo ... qt_programming_2024_autogen_timestamp_deps
 	@echo ... qt_programming_2024
+	@echo ... qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.obj
+	@echo ... qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.i
+	@echo ... qt_programming_2024_autogen/PNK5WDWK6L/qrc_res.s
 	@echo ... qt_programming_2024_autogen/mocs_compilation.obj
 	@echo ... qt_programming_2024_autogen/mocs_compilation.i
 	@echo ... qt_programming_2024_autogen/mocs_compilation.s
+	@echo ... src/Items/Armors/Armor.obj
+	@echo ... src/Items/Armors/Armor.i
+	@echo ... src/Items/Armors/Armor.s
+	@echo ... src/Items/Armors/FlamebreakerArmor.obj
+	@echo ... src/Items/Armors/FlamebreakerArmor.i
+	@echo ... src/Items/Armors/FlamebreakerArmor.s
+	@echo ... src/Items/Armors/OldShirt.obj
+	@echo ... src/Items/Armors/OldShirt.i
+	@echo ... src/Items/Armors/OldShirt.s
+	@echo ... src/Items/Characters/Character.obj
+	@echo ... src/Items/Characters/Character.i
+	@echo ... src/Items/Characters/Character.s
+	@echo ... src/Items/Characters/Link.obj
+	@echo ... src/Items/Characters/Link.i
+	@echo ... src/Items/Characters/Link.s
+	@echo ... src/Items/HeadEquipments/CapOfTheHero.obj
+	@echo ... src/Items/HeadEquipments/CapOfTheHero.i
+	@echo ... src/Items/HeadEquipments/CapOfTheHero.s
+	@echo ... src/Items/HeadEquipments/HeadEquipment.obj
+	@echo ... src/Items/HeadEquipments/HeadEquipment.i
+	@echo ... src/Items/HeadEquipments/HeadEquipment.s
+	@echo ... src/Items/Item.obj
+	@echo ... src/Items/Item.i
+	@echo ... src/Items/Item.s
+	@echo ... src/Items/LegEquipments/LegEquipment.obj
+	@echo ... src/Items/LegEquipments/LegEquipment.i
+	@echo ... src/Items/LegEquipments/LegEquipment.s
+	@echo ... src/Items/LegEquipments/WellWornTrousers.obj
+	@echo ... src/Items/LegEquipments/WellWornTrousers.i
+	@echo ... src/Items/LegEquipments/WellWornTrousers.s
+	@echo ... src/Items/Maps/Battlefield.obj
+	@echo ... src/Items/Maps/Battlefield.i
+	@echo ... src/Items/Maps/Battlefield.s
+	@echo ... src/Items/Maps/Map.obj
+	@echo ... src/Items/Maps/Map.i
+	@echo ... src/Items/Maps/Map.s
+	@echo ... src/Items/Maps/platform/Earthplatform.obj
+	@echo ... src/Items/Maps/platform/Earthplatform.i
+	@echo ... src/Items/Maps/platform/Earthplatform.s
+	@echo ... src/Items/Maps/platform/GrassPlatform.obj
+	@echo ... src/Items/Maps/platform/GrassPlatform.i
+	@echo ... src/Items/Maps/platform/GrassPlatform.s
+	@echo ... src/Items/Maps/platform/IcePlatform.obj
+	@echo ... src/Items/Maps/platform/IcePlatform.i
+	@echo ... src/Items/Maps/platform/IcePlatform.s
+	@echo ... src/Items/Maps/platform/platform.obj
+	@echo ... src/Items/Maps/platform/platform.i
+	@echo ... src/Items/Maps/platform/platform.s
+	@echo ... src/Items/Mountable.obj
+	@echo ... src/Items/Mountable.i
+	@echo ... src/Items/Mountable.s
+	@echo ... src/MyGame.obj
+	@echo ... src/MyGame.i
+	@echo ... src/MyGame.s
+	@echo ... src/Scenes/BattleScene.obj
+	@echo ... src/Scenes/BattleScene.i
+	@echo ... src/Scenes/BattleScene.s
+	@echo ... src/Scenes/Scene.obj
+	@echo ... src/Scenes/Scene.i
+	@echo ... src/Scenes/Scene.s
+	@echo ... src/main.obj
+	@echo ... src/main.i
+	@echo ... src/main.s
 .PHONY : help
 
 

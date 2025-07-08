@@ -141,17 +141,17 @@ Mountable *BattleScene::findNearestUnmountedMountable(const QPointF &pos, qreal 
     }
     return nearest;
 }
-/*
+
 // [FIXED] 实现完整的、多态的拾取逻辑
 Mountable* BattleScene::pickupMountable(Character *character, Mountable *mountable) {
     if (auto armor = dynamic_cast<Armor *>(mountable)) {
         return character->pickupArmor(armor);
     }
     // 假设你的Character类有pickupWeapon函数
-    if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
+//    if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
         // return character->pickupWeapon(weapon);
-    }
+//    }
     // 如果有其他类型的物品，可以在这里添加
     return nullptr;
 }
-*/
+

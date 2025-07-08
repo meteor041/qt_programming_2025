@@ -355,6 +355,7 @@ CMakeFiles/qt_programming_2024.dir/src/Scenes/BattleScene.cpp.obj: \
  F:/Qt/6.5.3/mingw_64/include/QtCore/qline.h \
  F:/Qt/6.5.3/mingw_64/include/QtCore/qnativeinterface.h \
  F:/Qt/6.5.3/mingw_64/include/QtGui/qkeysequence.h \
+ F:/Qt/6.5.3/mingw_64/include/QtCore/QList \
  E:\Qt\assistant_work\qt-programming-2025\src\Scenes\Scene.h \
  F:/Qt/6.5.3/mingw_64/include/QtWidgets/QGraphicsScene \
  F:/Qt/6.5.3/mingw_64/include/QtWidgets/qgraphicsscene.h \
@@ -378,7 +379,6 @@ CMakeFiles/qt_programming_2024.dir/src/Scenes/BattleScene.cpp.obj: \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/Map.h \
  F:/Qt/6.5.3/mingw_64/include/QtCore/QPointF \
  F:/Qt/6.5.3/mingw_64/include/QtCore/qpoint.h \
- F:/Qt/6.5.3/mingw_64/include/QtCore/QList \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Item.h \
  F:/Qt/6.5.3/mingw_64/include/QtWidgets/QGraphicsItem \
  F:/Qt/6.5.3/mingw_64/include/QtWidgets/qgraphicsitem.h \
@@ -391,17 +391,15 @@ CMakeFiles/qt_programming_2024.dir/src/Scenes/BattleScene.cpp.obj: \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/platform/Platform.h \
  F:/Qt/6.5.3/mingw_64/include/QtWidgets/QGraphicsPixmapItem \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Characters/Character.h \
- F:/Qt/6.5.3/mingw_64/include/QtWidgets/QGraphicsEllipseItem \
- E:/Qt/assistant_work/qt-programming-2025/src/Items/HeadEquipments/HeadEquipment.h \
- E:/Qt/assistant_work/qt-programming-2025/src/Items/Item.h \
- E:/Qt/assistant_work/qt-programming-2025/src/Items/Mountable.h \
+ F:/Qt/6.5.3/mingw_64/include/QtWidgets/QGraphicsObject \
+ F:/Qt/6.5.3/mingw_64/include/QtCore/QMap \
+ F:/Qt/6.5.3/mingw_64/include/QtCore/qmap.h \
+ F:/Qt/6.5.3/mingw_64/include/QtCore/QVector \
+ F:/Qt/6.5.3/mingw_64/include/QtCore/qvector.h \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/Armor.h \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Item.h \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Mountable.h \
- E:/Qt/assistant_work/qt-programming-2025/src/Items/LegEquipments/LegEquipment.h \
- E:/Qt/assistant_work/qt-programming-2025/src/Items/Item.h \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Mountable.h \
- E:/Qt/assistant_work/qt-programming-2025/src/Items/Armors/Armor.h \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Characters/Link.h \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Characters/Character.h \
  E:/Qt/assistant_work/qt-programming-2025/src/Items/Maps/Battlefield.h \

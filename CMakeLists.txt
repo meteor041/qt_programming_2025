@@ -1,3 +1,5 @@
+# CMakeLists.txt
+
 cmake_minimum_required(VERSION 3.28)
 project(qt_programming_2024)
 
@@ -6,60 +8,54 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-
+# 寻找Qt6的必要模块
 find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
         REQUIRED)
 
-add_executable(qt_programming_2024 src/main.cpp
+# [FIXED] 添加所有必需的源文件(.cpp)和资源文件(.qrc)
+# 头文件(.h)会自动被CMake处理，不需要写在这里
+add_executable(qt_programming_2024
+        # --- 核心与入口 ---
+        src/main.cpp
         src/MyGame.cpp
-        src/MyGame.h
-        src/Items/Item.cpp
-        src/Items/Item.h
-        src/Items/Characters/Character.cpp
-        src/Items/Characters/Character.h
-        src/Items/Characters/Link.cpp
-        src/Items/Characters/Link.h
-        src/Items/Armors/Armor.cpp
-        src/Items/Armors/Armor.h
-        src/Items/HeadEquipments/HeadEquipment.cpp
-        src/Items/HeadEquipments/HeadEquipment.h
-        src/Items/LegEquipments/LegEquipment.cpp
-        src/Items/LegEquipments/LegEquipment.h
-        src/Items/HeadEquipments/CapOfTheHero.cpp
-        src/Items/HeadEquipments/CapOfTheHero.h
-        src/Items/Armors/OldShirt.cpp
-        src/Items/Armors/OldShirt.h
-        src/Items/LegEquipments/WellWornTrousers.cpp
-        src/Items/LegEquipments/WellWornTrousers.h
+
+        # --- 场景 ---
         src/Scenes/Scene.cpp
-        src/Scenes/Scene.h
         src/Scenes/BattleScene.cpp
-        src/Scenes/BattleScene.h
-        res/res.qrc
+
+        # --- 地图与平台 ---
         src/Items/Maps/Map.cpp
-        src/Items/Maps/Map.h
         src/Items/Maps/Battlefield.cpp
-        src/Items/Maps/Battlefield.h
-        src/Items/Mountable.cpp
-        src/Items/Mountable.h
-        src/Items/Armors/FlamebreakerArmor.cpp
-        src/Items/Armors/FlamebreakerArmor.h
-        src/Items/Maps/platform/Platform.cpp src/Items/Maps/platform/Platform.h
-        src/Items/Maps/platform/Earthplatform.h
+        src/Items/Maps/platform/Platform.cpp
         src/Items/Maps/platform/Earthplatform.cpp
-        src/Items/Maps/platform/GrassPlatform.h
         src/Items/Maps/platform/GrassPlatform.cpp
-        src/Items/Maps/platform/IcePlatform.h
         src/Items/Maps/platform/IcePlatform.cpp
-        ../../../../D:/Character(1).h
 
-)
-target_link_libraries(qt_programming_2024
-        Qt::Core
-        Qt::Gui
-        Qt::Widgets
+        # --- 基础物品与角色 ---
+        src/Items/Item.cpp
+        src/Items/Mountable.cpp
+        src/Items/Characters/Character.cpp
+        src/Items/Characters/Link.cpp
+
+        # --- 装备 ---
+        src/Items/HeadEquipments/HeadEquipment.cpp
+        src/Items/HeadEquipments/CapOfTheHero.cpp
+        src/Items/Armors/Armor.cpp
+        src/Items/Armors/OldShirt.cpp
+        src/Items/Armors/FlamebreakerArmor.cpp
+        src/Items/LegEquipments/LegEquipment.cpp
+        src/Items/LegEquipments/WellWornTrousers.cpp
+
+        # --- 资源文件 ---
+        res/res.qrc
 )
 
+# 链接Qt的库
+target_link_libraries(qt_programming_2024 PRIVATE
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+)

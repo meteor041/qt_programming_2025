@@ -9,11 +9,23 @@
 	"INCLUDE_DIR" : "E:/Qt/assistant_work/qt-programming-2025/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/qt_programming_2024_autogen/include",
 	"INPUTS" : 
 	[
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_punch.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_attack2.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_climb.png",
 		"E:/Qt/assistant_work/qt-programming-2025/res/platform1.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_hurt.png",
 		"E:/Qt/assistant_work/qt-programming-2025/res/platform2.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_attack3.png",
 		"E:/Qt/assistant_work/qt-programming-2025/res/MapBG2.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_doublejump.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_run.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_attack1.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_run_attack.png",
 		"E:/Qt/assistant_work/qt-programming-2025/res/MapBG1.png",
-		"E:/Qt/assistant_work/qt-programming-2025/res/platform3.png"
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_idle.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_jump.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/platform3.png",
+		"E:/Qt/assistant_work/qt-programming-2025/res/Biker_death.png"
 	],
 	"LOCK_FILE" : "E:/Qt/assistant_work/qt-programming-2025/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/qt_programming_2024_autogen.dir/AutoRcc_res_PNK5WDWK6L_Lock.lock",
 	"MULTI_CONFIG" : false,

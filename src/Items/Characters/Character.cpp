@@ -144,14 +144,14 @@ void Character::processInput() {
     if (fireDown) { fire(); }
 }
 
-/*void Character::fire() {
-    if (currentWeapon && (currentState == IDLE || currentState == RUNNING)) { // 只有在特定状态下才能攻击
-        setState(PUNCHING);
+void Character::fire() {
+ //   if (currentWeapon && (currentState == IDLE || currentState == RUNNING)) { // 只有在特定状态下才能攻击
+//        setState(PUNCHING);
         // 实际攻击判定可以在动画的某一帧触发
         // currentWeapon->attack(this, facingRight);
-    }
+//    }
 }
-*/
+
 void Character::takeDamage(int amount) {
     if (health <= 0) return;
     health -= amount;
