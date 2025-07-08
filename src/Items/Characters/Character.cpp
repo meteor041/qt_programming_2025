@@ -28,6 +28,15 @@ void Character::setRightDown(bool rightDown) {
     Character::rightDown = rightDown;
 }
 
+
+void Character::setJumpDown(bool jumpDown) {
+    Character::jumpDown = jumpDown;
+}
+
+bool Character::isJumpDown() const {
+    return jumpDown;
+}
+
 bool Character::isPickDown() const {
     return pickDown;
 }
@@ -50,13 +59,17 @@ void Character::processInput() {
     if (isLeftDown()) {
         velocity.setX(velocity.x() - moveSpeed);
         setTransform(QTransform().scale(1, 1));
-    }
-    if (isRightDown()) {
+    } else if (isRightDown()) {
         velocity.setX(velocity.x() + moveSpeed);
         setTransform(QTransform().scale(-1, 1));
     }
+    if (jumpDown) {
+        velocity.setY(velocity.y() - 80);
+    }
     setVelocity(velocity);
 
+    // 调试输出
+    qDebug() << "Character velocity:" << velocity;
     if (!lastPickDown && pickDown) { // first time pickDown
         picking = true;
     } else {

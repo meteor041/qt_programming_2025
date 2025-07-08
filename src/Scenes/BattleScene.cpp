@@ -22,7 +22,7 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     // 创建角色
     character = new Link();
     addItem(character);
-    character->setScale(2.0);
+    character->setScale(1.0);
     character->setZValue(10);
     // 使用新的getSpawnPos，它会基于平台位置来决定出生点
     character->setPos(map->getSpawnPos());
@@ -82,7 +82,17 @@ void BattleScene::processMovement() {
     Scene::processMovement();
     if (character != nullptr) {
         // deltaTime/1000.0 将毫秒转换为秒
-        character->setPos(character->pos() + character->getVelocity() * (deltaTime / 1000.0));
+        QPointF newPos = character->pos() + character->getVelocity() * (double) deltaTime;
+
+        // 获取边界
+        QRectF bounds = sceneRect();
+        QRectF charRect = character->boundingRect();
+
+        // 应用边界限制
+        newPos.setX(qBound(0.0, newPos.x(), bounds.width() - charRect.width()));
+        newPos.setY(qBound(0.0, newPos.y(), bounds.height() - charRect.height()));
+
+        character->setPos(newPos);
     }
 }
 
@@ -111,7 +121,7 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
         if (character) {
             // 只有在地面上才能跳
             if (map->getGroundPlatform(character->pos()) != nullptr) {
-         //还没写       character->setVelocity(character->getVelocity().x(), -800); // 给予一个向上的初速度
+                character->setJumpDown(true);
             }
         }
         break;
@@ -130,6 +140,10 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
         break;
     case Qt::Key_J:
         if (character) character->setPickDown(false);
+        break;
+    case Qt::Key_W:
+    case Qt::Key_Space:
+        if (character) character->setJumpDown(false);
         break;
     default:
         Scene::keyReleaseEvent(event);
