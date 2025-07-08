@@ -111,32 +111,66 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
             if (map->getGroundPlatform(character->pos()) != nullptr) {
          //还没写       character->setVelocity(character->getVelocity().x(), -800); // 给予一个向上的初速度
             }
-        }
-        break;
-    default:
-        Scene::keyPressEvent(event);
+            break;
+        case Qt::Key_K: // 新增攻击按键
+            if (character != nullptr) {
+                character->setAttackDown(true);
+            }
+            break;
+        default:
+            Scene::keyPressEvent(event);
     }
 }
 
 void BattleScene::keyReleaseEvent(QKeyEvent *event) {
     switch (event->key()) {
-    case Qt::Key_A:
-        if (character) character->setLeftDown(false);
-        break;
-    case Qt::Key_D:
-        if (character) character->setRightDown(false);
-        break;
-    case Qt::Key_J:
-        if (character) character->setPickDown(false);
-        break;
-    default:
-        Scene::keyReleaseEvent(event);
+        case Qt::Key_A:
+            if (character != nullptr) {
+                character->setLeftDown(false);
+            }
+            break;
+        case Qt::Key_D:
+            if (character != nullptr) {
+                character->setRightDown(false);
+            }
+            break;
+        case Qt::Key_J:
+            if (character != nullptr) {
+                character->setPickDown(false);
+            }
+            break;
+        case Qt::Key_K: // 新增攻击按键
+            if (character != nullptr) {
+                character->setAttackDown(false);
+            }
+            break;
+        default:
+            Scene::keyReleaseEvent(event);
     }
 }
 
 void BattleScene::update() {
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
     Scene::update();
+    processCombat(); // 在主循环中调用
+}
+
+void BattleScene::processCombat() {
+    if (character->isAttacking()) {
+        // 使用 collidesWithItem() 进行碰撞检测
+        if (character->collidesWithItem(enemy)) {
+            qDebug() << "Hit!";
+            enemy->takeDamage(character->getAttackPower());
+            // 可以添加击退效果等
+            if (enemy->health <= 0) {
+                qDebug() << "Enemy defeated!";
+                removeItem(enemy);
+                // delete enemy; // 注意内存管理
+                enemy = nullptr;
+            }
+        }
+    }
+    // 这里可以添加敌人的攻击逻辑
 }
 
 void BattleScene::processPicking() {

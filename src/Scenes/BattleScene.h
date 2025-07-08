@@ -18,7 +18,9 @@ public:
     void processInput() override;
     void processMovement() override;
     void processPicking() override;
+    void processCombat(); // 新增战斗处理函数
 
+protected slots:
     // 【核心改动】声明我们将重写物理处理函数
     void processPhysics() override;
 
@@ -35,6 +37,7 @@ private:
 
     Map *map;
     Character *character;
+    Character *enemy; // 添加敌人角色
     Armor *spareArmor;
 };
 

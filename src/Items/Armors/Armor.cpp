@@ -10,7 +10,7 @@ Armor::Armor(QGraphicsItem *parent, const QString &pixmapPath) : Item(parent, pi
 
 void Armor::mountToParent() {
     Mountable::mountToParent();
-    setScale(0.8);
+    setScale(0.4);
     setPos(-59, -176);
     if (pixmapItem != nullptr) {
         pixmapItem->setPos(0, 0);
@@ -19,7 +19,7 @@ void Armor::mountToParent() {
 
 void Armor::unmount() {
     Mountable::unmount();
-    setScale(0.8);
+    setScale(0.4);
     if (pixmapItem != nullptr) {
         pixmapItem->setPos(0, -120);
     }

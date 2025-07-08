@@ -63,6 +63,13 @@ void Character::processInput() {
         picking = false;
     }
     lastPickDown = pickDown;
+
+    if (attackDown && !lastAttackDown) {
+        attacking = true;
+    } else {
+        attacking = false;
+    }
+    lastAttackDown = attackDown;
 }
 
 bool Character::isPicking() const {
@@ -82,3 +89,8 @@ Armor *Character::pickupArmor(Armor *newArmor) {
     return oldArmor;
 }
 
+void Armor::mountToParent() {
+    // ...
+    setScale(0.8);
+    // ...
+}
