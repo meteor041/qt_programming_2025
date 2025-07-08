@@ -1,14 +1,13 @@
-//
-// Created by gerw on 8/20/24.
-//
+// src/Items/Characters/Link.cpp
 
-#include <memory>
 #include "Link.h"
 #include "../HeadEquipments/CapOfTheHero.h"
 #include "../Armors/OldShirt.h"
 #include "../LegEquipments/WellWornTrousers.h"
 
-Link::Link(QGraphicsItem *parent) : Character(parent) {
+// [MODIFIED] 将 playerID 传递给 Character 基类
+Link::Link(int playerID, QGraphicsItem *parent) : Character(playerID, parent) {
+    // 你的装备初始化代码非常棒，保持原样
     headEquipment = new CapOfTheHero(this);
     legEquipment = new WellWornTrousers(this);
     armor = new OldShirt(this);

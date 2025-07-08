@@ -14,7 +14,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.30.5/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.30.5/CMakeRCCompiler.cmake"
   "CMakeFiles/3.30.5/CMakeSystem.cmake"
-  "E:/Qt/assistant_work/qt-programming-2025/res/res.qrc"
   "F:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/FindWrapAtomic.cmake"
   "F:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/FindWrapVulkanHeaders.cmake"
   "F:/Qt/6.5.3/mingw_64/lib/cmake/Qt6/Qt6Config.cmake"
@@ -197,7 +196,6 @@ set(CMAKE_MAKEFILE_OUTPUTS
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/qt_programming_2024_autogen.dir/AutogenInfo.json"
-  "CMakeFiles/qt_programming_2024_autogen.dir/AutoRcc_res_PNK5WDWK6L_Info.json"
   ".qt/QtDeploySupport.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   )

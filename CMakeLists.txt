@@ -54,6 +54,7 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Items/Maps/platform/GrassPlatform.cpp
         src/Items/Maps/platform/IcePlatform.h
         src/Items/Maps/platform/IcePlatform.cpp
+        ../../../../D:/Character(1).h
 
 )
 target_link_libraries(qt_programming_2024

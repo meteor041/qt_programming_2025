@@ -1,14 +1,26 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/">
-    <!--
-      在这里把你 res 文件夹下的图片文件名列出来。
-      你需要把下面的 "你的第一张图片.png" 和 "你的第二张图片.png"
-      替换成你那两张图片的真实文件名！
-    -->
+    <!-- 地图背景 -->
     <file>MapBG1.png</file>
     <file>MapBG2.png</file>
+
+    <!-- 平台贴图 -->
     <file>platform1.png</file>
     <file>platform2.png</file>
     <file>platform3.png</file>
+
+    <!-- Biker 角色动画精灵图 -->
+    <file>Biker_attack1.png</file>
+    <file>Biker_attack2.png</file>
+    <file>Biker_attack3.png</file>
+    <file>Biker_climb.png</file>
+    <file>Biker_death.png</file>
+    <file>Biker_doublejump.png</file>
+    <file>Biker_hurt.png</file>
+    <file>Biker_idle.png</file>
+    <file>Biker_jump.png</file>
+    <file>Biker_punch.png</file>
+    <file>Biker_run.png</file>
+    <file>Biker_run_attack.png</file>
 </qresource>
 </RCC>
