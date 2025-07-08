@@ -11,15 +11,13 @@ class Scene : public QGraphicsScene {
 
 public:
     explicit Scene(QObject *parent);
-
     void startLoop();
 
     // 声明游戏循环的各个阶段
     virtual void processInput();
-    virtual void processMovement();
+    // [FIXED] 重命名以匹配新的架构，现在任何场景都可以有角色更新阶段
+    virtual void processCharacterUpdates();
     virtual void processPicking();
-
-    // 【核心改动】新增物理处理阶段的虚函数
     virtual void processPhysics();
 
 protected slots:

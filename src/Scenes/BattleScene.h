@@ -8,7 +8,7 @@
 #include "Scene.h"
 #include "../Items/Maps/Map.h"
 #include "../Items/Characters/Character.h"
-#include "../Items/Armors/Armor.h"
+//#include "../Items/Armors/Armor.h"
 #include "../Items/Mountable.h" // [FIXED] 确保包含Mountable
 
 class BattleScene : public Scene {
