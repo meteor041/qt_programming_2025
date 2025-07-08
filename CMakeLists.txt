@@ -38,7 +38,7 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Scenes/Scene.h
         src/Scenes/BattleScene.cpp
         src/Scenes/BattleScene.h
-        assets/assets.qrc
+        res/res.qrc
         src/Items/Maps/Map.cpp
         src/Items/Maps/Map.h
         src/Items/Maps/Battlefield.cpp
@@ -46,7 +46,16 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Items/Mountable.cpp
         src/Items/Mountable.h
         src/Items/Armors/FlamebreakerArmor.cpp
-        src/Items/Armors/FlamebreakerArmor.h)
+        src/Items/Armors/FlamebreakerArmor.h
+        src/Items/Maps/platform/Platform.cpp src/Items/Maps/platform/Platform.h
+        src/Items/Maps/platform/Earthplatform.h
+        src/Items/Maps/platform/Earthplatform.cpp
+        src/Items/Maps/platform/GrassPlatform.h
+        src/Items/Maps/platform/GrassPlatform.cpp
+        src/Items/Maps/platform/IcePlatform.h
+        src/Items/Maps/platform/IcePlatform.cpp
+
+)
 target_link_libraries(qt_programming_2024
         Qt::Core
         Qt::Gui

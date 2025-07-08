@@ -10,8 +10,10 @@
 
 class Item : public QGraphicsItem {
 public:
+    //构造函数
     explicit Item(QGraphicsItem *parent, const QString &pixmapPath);
 
+    //生成矩形框
     [[nodiscard]] QRectF boundingRect() const override {
         if (pixmapItem != nullptr) {
             return this->pixmapItem->boundingRect();
@@ -20,12 +22,14 @@ public:
         return {};
     }
 
+    //渲染
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override {
         // Draw nothing as it is an empty item
         // Its pixmapItem is automatically handled by children's paint()
     }
 
+    //用于显示图形的指针
 protected:
     QGraphicsPixmapItem *pixmapItem{};
 };

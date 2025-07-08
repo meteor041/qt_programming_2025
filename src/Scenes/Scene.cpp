@@ -1,6 +1,4 @@
-//
-// Created by gerw on 8/20/24.
-//
+// src/Scenes/Scene.cpp
 
 #include <QDateTime>
 #include "Scene.h"
@@ -18,8 +16,13 @@ void Scene::update() {
     }
     lastTime = currentTime;
 
+    // 更新游戏循环，加入物理处理
     processInput();
     processMovement();
+
+    // 【核心改动】在移动之后，进行物理计算和碰撞修正
+    processPhysics();
+
     processPicking();
 }
 
@@ -27,15 +30,12 @@ void Scene::startLoop() {
     timer->start(1000 / 90); // 90FPS
 }
 
-void Scene::processInput() {
+// 提供各个阶段的默认空实现
+void Scene::processInput() {}
 
-}
+void Scene::processMovement() {}
 
-void Scene::processMovement() {
+void Scene::processPicking() {}
 
-}
-
-void Scene::processPicking() {
-
-}
-
+// 【核心改动】为新的物理阶段提供默认空实现
+void Scene::processPhysics() {}
