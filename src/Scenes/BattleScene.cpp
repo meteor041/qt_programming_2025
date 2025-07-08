@@ -35,7 +35,7 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     // 【核心改动 #2】修复盔甲的放置位置
     // 我们不能再使用 getFloorHeight()，而是要找到一个平台来放置它
     QPointF armorTargetPos(sceneRect().center().x() + 200, 0); // 设定一个目标水平位置
-    Platform* groundForArmor = map->getGroundPlatform(armorTargetPos);
+    Platform* groundForArmor = map->getGroundPlatform(armorTargetPos, spareArmor->boundingRect().height());
     if (groundForArmor) {
         // 如果找到了平台，将盔甲放在平台表面上方
         spareArmor->setPos(armorTargetPos.x(),
@@ -55,7 +55,7 @@ void BattleScene::processPhysics() {
     // const qreal GRAVITY = 2000.0; // 定义一个重力加速度（像素/秒^2）
 
     // // 1. 对角色施加重力 (除非它在地面上)
-    Platform* ground = map->getGroundPlatform(character->pos());
+    Platform* ground = map->getGroundPlatform(character->pos(), character->boundingRect().height());
 
     bool onGround = (ground != nullptr);
     qDebug() << "onGround: " << onGround;
@@ -125,7 +125,7 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_Space:
         if (character) {
             // 只有在地面上才能跳
-            if (map->getGroundPlatform(character->pos()) != nullptr) {
+            if (map->getGroundPlatform(character->pos(), character->boundingRect().height()) != nullptr) {
                 character->setJumpDown(true);
             }
         }

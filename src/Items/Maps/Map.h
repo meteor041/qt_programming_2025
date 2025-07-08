@@ -22,7 +22,7 @@ public:
 
     // 【核心改动】新增函数：根据一个位置，获取其脚下最高的平台
     // const 保证这个函数不会修改Map的状态
-    Platform* getGroundPlatform(const QPointF& position) const;
+    Platform* getGroundPlatform(const QPointF& position, qreal characterHeight = 50.0) const;
 
     // 【移除】这个函数的功能已经被 getGroundPlatform 替代，不再需要
     // virtual qreal getFloorHeight();
