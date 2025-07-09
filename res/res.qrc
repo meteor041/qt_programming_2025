@@ -7,5 +7,7 @@
         <file>platform3.png</file>
         <file>Biker_basic.png</file>
         <file>Biker_crouch.png</file>
+        <file>fist.png</file>
+        <file>knife.png</file>
     </qresource>
 </RCC>
