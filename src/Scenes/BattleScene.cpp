@@ -140,6 +140,10 @@ void BattleScene::processMovement() {
                 bool horizontalOverlap = (newCharRect.right() > platformRect.left() && 
                                          newCharRect.left() < platformRect.right());
                 
+                // 检查垂直范围是否重叠
+                bool verticalOverlap = (newCharRect.bottom() > platformRect.top() && 
+                                       newCharRect.top() < platformRect.bottom());
+                
                 if (horizontalOverlap) {
                     // 1. 底部碰撞检测（角色下落撞到平台顶部）
                     if (character->getVelocity().y() > 0) { // 角色正在下落
@@ -169,6 +173,41 @@ void BattleScene::processMovement() {
                             newPos.setY(platformBottom);
                             // 反转Y轴速度（向下弹回）
                             character->setVelocity(QPointF(character->getVelocity().x(), -character->getVelocity().y()));
+                            break; // 找到碰撞就停止检查其他平台
+                        }
+                    }
+                }
+                
+                // 3. 左右侧碰撞检测（新增）
+                if (verticalOverlap) {
+                    // 左侧碰撞检测（角色从左侧撞到平台）
+                    if (character->getVelocity().x() > 0) { // 角色正在向右移动
+                        qreal currentRight = currentCharRect.right();
+                        qreal newRight = newCharRect.right();
+                        qreal platformLeft = platformRect.left();
+                        
+                        // 检查是否从平台左侧穿过平台左边界
+                        if (currentRight <= platformLeft && newRight > platformLeft) {
+                            // 将角色位置限制在平台左侧
+                            newPos.setX(platformLeft - charRect.width());
+                            // 反转X轴速度
+                            character->setVelocity(QPointF(-character->getVelocity().x(), character->getVelocity().y()));
+                            break; // 找到碰撞就停止检查其他平台
+                        }
+                    }
+                    
+                    // 右侧碰撞检测（角色从右侧撞到平台）
+                    else if (character->getVelocity().x() < 0) { // 角色正在向左移动
+                        qreal currentLeft = currentCharRect.left();
+                        qreal newLeft = newCharRect.left();
+                        qreal platformRight = platformRect.right();
+                        
+                        // 检查是否从平台右侧穿过平台右边界
+                        if (currentLeft >= platformRight && newLeft < platformRight) {
+                            // 将角色位置限制在平台右侧
+                            newPos.setX(platformRight);
+                            // 反转X轴速度
+                            character->setVelocity(QPointF(-character->getVelocity().x(), character->getVelocity().y()));
                             break; // 找到碰撞就停止检查其他平台
                         }
                     }
