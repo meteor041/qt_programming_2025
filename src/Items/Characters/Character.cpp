@@ -62,28 +62,39 @@ void Character::setVelocity(const QPointF &velocity) {
 }
 
 void Character::processInput() {
-    auto velocity = QPointF(0, 0);
-    const auto moveSpeed = 0.3;
-    if (isLeftDown()) {
-        velocity.setX(velocity.x() - moveSpeed);
-        setTransform(QTransform().scale(1, 1));
-    } else if (isRightDown()) {
-        velocity.setX(velocity.x() + moveSpeed);
-        setTransform(QTransform().scale(-1, 1));
-    }
-    if (jumpDown) {
-        velocity.setX(Character::velocity.x()); // 左右速度不变
-        velocity.setY(velocity.y() - 0.8);
-    } 
-    if (!onGround) {
-        velocity.setY(Character::velocity.y() + 0.1);
-    } else if (!jumpDown) {
-        velocity.setY(0);
-    }
-    setVelocity(velocity);
+    // 1. 获取当前速度，我们不再重置它，而是在它的基础上修改
+    QPointF currentVelocity = getVelocity();
 
+    // 2. 处理水平移动
+    const auto moveSpeed = 5.0; // 我们可以给一个稍大的瞬时速度
+    qreal targetHorizontalVelocity = 0;
+    if (isLeftDown()) {
+        targetHorizontalVelocity = -moveSpeed;
+        setTransformOriginPoint(boundingRect().center());
+        setTransform(QTransform().scale(-1,1));
+    } else if (isRightDown()) {
+        targetHorizontalVelocity = moveSpeed;
+        setTransformOriginPoint(boundingRect().center());
+        setTransform(QTransform().scale(1,1));
+    }
+    currentVelocity.setX(targetHorizontalVelocity);
+
+    // 3. 处理跳跃 - 这是一个瞬时动作
+    // 只有当跳跃键被按下的那一帧，我们才施加向上的速度脉冲。
+    // BattleScene 会确保只有在地面上时 setJumpDown(true) 才有效。
+    if (isJumpDown()) {
+        const auto jumpImpulse = -18.0; // 负数表示向上，这是一个较强的瞬时速度
+        currentVelocity.setY(jumpImpulse);
+        // 跳跃是一次性的，施加完脉冲后就将状态重置，防止连续跳跃
+        setJumpDown(false);
+    }
+
+    // 4. 将计算出的新速度设置回去
+    setVelocity(currentVelocity);
+
+    // 5. 处理拾取逻辑 (保持不变)
     // 调试输出
-    qDebug() << "Character velocity:" << velocity;
+    // qDebug() << "Character velocity:" << velocity;
     if (!lastPickDown && pickDown) { // first time pickDown
         picking = true;
     } else {

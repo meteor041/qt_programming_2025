@@ -46,47 +46,75 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     }
 }
 
-// 【核心改动 #3】实现物理处理逻辑
+// 【核心改动 #3】实现物理处理逻辑 (修正版)
 void BattleScene::processPhysics() {
     if (!character || !map) {
         return;
     }
 
-    // const qreal GRAVITY = 2000.0; // 定义一个重力加速度（像素/秒^2）
+    // 定义物理常量
+    const qreal GRAVITY = 0.8;
+    const qreal MAX_FALL_SPEED = 20.0;
 
-    // // 1. 对角色施加重力 (除非它在地面上)
-    Platform* ground = map->getGroundPlatform(character->pos(), character->boundingRect().height());
+    // --- 步骤 1: 应用重力 ---
+    QPointF currentVelocity = character->getVelocity();
+    currentVelocity.setY(currentVelocity.y() + GRAVITY);
 
-    bool onGround = (ground != nullptr);
-    qDebug() << "onGround: " << onGround;
-    character->setOnGround(onGround);
-    // if (ground == nullptr && !character->getJumpDown()) { // 如果脚下没有平台，说明在空中
-    //     // 增加向下的速度
-    //     //还没写 character->addVelocity(0, GRAVITY * (deltaTime / 1000.0));
-    //     character->velocity.setY(character->velocity.y() + GRAVITY * (deltaTime / 1000.0));
-    // } else { // 如果脚下有平台
-    //     qreal footY = character->sceneBoundingRect().bottom();
-    //     qreal surfaceY = ground->getSurfaceY();
+    if (currentVelocity.y() > MAX_FALL_SPEED) {
+        currentVelocity.setY(MAX_FALL_SPEED);
+    }
+    // 注意：我们暂时不把速度设置回去，因为如果发生碰撞，速度会被重置。
 
-    //     // 检查是否正在下落并且已经接触或穿过平台
-    //     if (footY >= surfaceY && character->getVelocity().y() > 0) {
-    //         // 将角色“吸附”在平台表面
-    //         character->setY(surfaceY - character->boundingRect().height());
-    //         // 垂直速度清零，停止下落
-    //     //还没写    character->setVelocity(character->getVelocity().x(), 0);
-    //     }
-    // }
+    // --- 步骤 2: 碰撞检测与解决 ---
+    bool onGroundThisFrame = false;
+
+    QRectF charRect = character->boundingRect();
+    // 查找角色当前位置下方的最高平台
+    Platform* ground = map->getGroundPlatform(character->pos(), charRect.height());
+
+    if (ground != nullptr) {
+        qreal surfaceY = ground->getSurfaceY();
+
+        // 获取角色脚部在【当前帧开始时】的位置
+        qreal footY_current = character->pos().y() + charRect.height();
+
+        // 预测角色脚部在【当前帧结束时】的位置 (如果没有任何碰撞)
+        qreal footY_next = footY_current + currentVelocity.y();
+
+        // 【！！！核心修复！！！】
+        // 新的碰撞条件：
+        // 1. 角色正在下落 (velocity >= 0)。
+        // 2. 在本帧开始时，脚还在平台上方。
+        // 3. 在本帧移动后，脚将会移动到平台下方。
+        // 这段逻辑能够捕捉到“穿越”平台表面的瞬间，无论速度有多快！
+        if (currentVelocity.y() >= 0 && footY_current <= surfaceY && footY_next >= surfaceY) {
+
+            // --- 碰撞解决！---
+            // 发生了碰撞，将角色精确地放在平台表面
+            character->setY(surfaceY - charRect.height());
+
+            // 垂直速度清零
+            currentVelocity.setY(0);
+
+            // 标记角色已在地面上
+            onGroundThisFrame = true;
+        }
+    }
+
+    // --- 步骤 3: 更新最终的速度和状态 ---
+    character->setVelocity(currentVelocity);
+    character->setOnGround(onGroundThisFrame);
 }
 
 
 // --- 以下是其他函数的代码，大部分保持不变 ---
 
-// 处理角色移动，现在只负责应用速度，物理修正由processPhysics完成
+// 这个函数现在只负责应用最终计算出的速度来移动角色
 void BattleScene::processMovement() {
-    Scene::processMovement();
     if (character != nullptr) {
         // deltaTime/1000.0 将毫秒转换为秒
-        QPointF newPos = character->pos() + character->getVelocity() * (double) deltaTime;
+        // 在我们的帧同步模型里，可以简化为直接应用速度
+        QPointF newPos = character->pos() + character->getVelocity();
 
         // 获取边界
         QRectF bounds = sceneRect();
@@ -94,8 +122,8 @@ void BattleScene::processMovement() {
 
         // 应用边界限制
         newPos.setX(qBound(0.0, newPos.x(), bounds.width() - charRect.width()));
-        // 修改Y轴限制：不允许进入画面最下方120像素的区域
-        newPos.setY(qBound(0.0, newPos.y(), bounds.height() - charRect.height() - 120.0));
+        // (Y轴边界可以暂时放宽，因为平台会阻止下落)
+        newPos.setY(qBound(0.0, newPos.y(), bounds.height()));
 
         character->setPos(newPos);
     }
@@ -120,12 +148,11 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_J:
         if (character) character->setPickDown(true);
         break;
-    // 【建议】增加跳跃键
     case Qt::Key_W:
     case Qt::Key_Space:
         if (character) {
-            // 只有在地面上才能跳
-            if (map->getGroundPlatform(character->pos(), character->boundingRect().height()) != nullptr) {
+            // 只有在地面上 (`isOnGround()` 为真) 才能设置跳跃标志
+            if (character->isOnGround()) {
                 character->setJumpDown(true);
             }
         }

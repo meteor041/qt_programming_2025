@@ -25,31 +25,50 @@ void Map::scaleToFitScene(QGraphicsScene *scene) {
            (sceneRect.height() - boundingRect().height() * scaleFactor) / 2);
 }
 
-// 【核心改动】实现 getGroundPlatform 函数
-Platform* Map::getGroundPlatform(const QPointF& position,
-        qreal characterHeight) const {
-    Platform* ground = nullptr;
-    qreal highestY = 1e9; // 初始化一个极大值，代表无穷远
+// 【核心改动】实现 getGroundPlatform 函数  ！！！注意这个函数只是返回脚下最高的平台，不一定代表角色就在平台上
+Platform* Map::getGroundPlatform(const QPointF& characterPos, qreal characterHeight) const {
+    const qreal characterWidth = 50.0; // 重要：这个值应与你角色的实际宽度匹配！
 
-    // 遍历地图中所有的平台
+    Platform* groundCandidate = nullptr;
+    // 初始化一个极大的Y值。我们会寻找Y值比它小的平台。
+    qreal highestSurfaceY = 1e9;
+
+    QRectF characterRect(characterPos, QSizeF(characterWidth, characterHeight));
+    qreal characterBottom = characterRect.bottom();
+    const qreal LANDING_TOLERANCE = 2.0;
+
+    // 遍历所有平台
     for (Platform* p : m_platforms) {
-        QRectF platformRect = p->sceneBoundingRect(); // 获取平台在场景中的矩形范围
+        QRectF platformRect = p->sceneBoundingRect();
 
-        // 检查：1. 角色是否在平台的水平(X)范围内
-        //       2. 角色的位置是否在平台的上方 (position.y() <= platformRect.top())
-        if (position.x() >= platformRect.left() &&
-            position.x() <= platformRect.right() &&
-            position.y() >= platformRect.top() - characterHeight) {
-            qDebug() << position.y() << ", " << platformRect.top();
-            // 如果找到一个符合条件的平台，我们还要判断它是不是“最高”的那个
-            // （在屏幕坐标系中，Y值越小越靠上）
-            if (platformRect.top() < highestY) {
-                highestY = platformRect.top(); // 更新最高点
-                ground = p; // 记录这个平台
+        // --- 第1步：过滤 ---
+        // 检查平台是否是一个有效的“地面候选者”。
+
+        // 条件 A: 角色和平台在水平方向上必须有重叠。
+        bool horizontalOverlap = (characterRect.left() < platformRect.right() &&
+                                  characterRect.right() > platformRect.left());
+
+        // 条件 B: 平台的表面必须在角色脚的下方（或在容差范围内）。
+        // 这会将所有在角色头顶上方的平台排除掉。
+        bool isPlatformBelowFeet = (characterBottom <= platformRect.top() + LANDING_TOLERANCE);
+
+        if (horizontalOverlap && isPlatformBelowFeet) {
+            // 如果一个平台通过了过滤，它就是一个“候选者”。
+
+            // --- 第2步：选择 ---
+            // 从所有候选者中，选出最靠上的那一个（Y坐标最小）。
+            if (platformRect.top() < highestSurfaceY) {
+                // 我们找到了一个比之前记录的更靠上的平台。
+                // 更新我们的“最佳选择”。
+                highestSurfaceY = platformRect.top();
+                groundCandidate = p;
             }
         }
     }
-    return ground; // 返回找到的最高平台，如果脚下没有则返回 nullptr
+
+    // 循环结束后，groundCandidate 要么是nullptr（脚下没有任何平台），
+    // 要么指向那个离角色最近的下方平台。
+    return groundCandidate;
 }
 
 
