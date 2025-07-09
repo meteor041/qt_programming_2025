@@ -25,8 +25,14 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     character->setScale(1.0);
     character->setZValue(10);
     // 使用新的getSpawnPos，它会基于平台位置来决定出生点
-    character->setPos(map->getSpawnPos());
+    QPointF spawnPos = map->getSpawnPos();
+    character->setPos(spawnPos);
 
+    enemy = new Link();
+    addItem(enemy);
+    enemy->setScale(1.0);
+    enemy->setZValue(10);
+    enemy->setPos(spawnPos.x() - 200, spawnPos.y());
     // 创建备用盔甲
     spareArmor = new FlamebreakerArmor();
     addItem(spareArmor);
@@ -177,7 +183,7 @@ void BattleScene::processMovement() {
                         }
                     }
                 }
-                qDebug() << "垂直重叠" << currentCharRect << newCharRect << platformRect;
+                // qDebug() << "垂直重叠" << currentCharRect << newCharRect << platformRect;
                 
                 // 3. 左右侧碰撞检测（新增）
                 if (verticalOverlap) {
@@ -261,6 +267,12 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
             }
         }
         break;
+    // 新增：K键攻击
+    case Qt::Key_K:
+        if (character && !character->isDead()) {
+            attackKeyDown = true;
+        }
+        break;
     default:
         Scene::keyPressEvent(event);
     }
@@ -291,12 +303,61 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
     case Qt::Key_Space:
         if (character) character->setJumpDown(false);
         break;
+    // 新增：K键释放
+    case Qt::Key_K:
+        attackKeyDown = false;
+        break;
     default:
         Scene::keyReleaseEvent(event);
     }
 }
 
+// 新增：战斗处理函数
+void BattleScene::processCombat() {
+    if (!character || !enemy || character->isDead()) {
+        return;
+    }
+    
+    // 处理角色攻击
+    if (attackKeyDown) {
+        // 检查敌人是否在攻击范围内
+        if (isInAttackRange(character, enemy, character->getWeaponAttackRange())) {
+            // 执行攻击
+            character->performAttack();
+            
+            // 对敌人造成伤害（这里设定基础伤害为20）
+            int damage = 20;
+            enemy->takeDamage(damage);
+            
+            qDebug() << "Character attacked enemy! Enemy health:" << enemy->getHealth();
+        } else {
+            qDebug() << "Enemy is too far to attack!";
+        }
+        
+        // 重置攻击状态，避免连续攻击
+        attackKeyDown = false;
+    }
+}
+
+// 新增：检查攻击范围的辅助函数
+bool BattleScene::isInAttackRange(Character* attacker, Character* target, qreal range) {
+    if (!attacker || !target) {
+        return false;
+    }
+    
+    QPointF attackerPos = attacker->pos();
+    QPointF targetPos = target->pos();
+    
+    // 计算两个角色之间的距离
+    qreal distance = QLineF(attackerPos, targetPos).length();
+    
+    return distance <= range;
+}
+
+
 void BattleScene::update() {
+    // 添加战斗处理
+    processCombat();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
     Scene::update();
 }

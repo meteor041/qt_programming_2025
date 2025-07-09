@@ -18,9 +18,10 @@ public:
     void processInput() override;
     void processMovement() override;
     void processPicking() override;
-
-    // 【核心改动】声明我们将重写物理处理函数
     void processPhysics() override;
+    
+    // 新增：战斗处理函数
+    void processCombat();
 
 protected slots:
     void update() override;
@@ -32,10 +33,17 @@ protected:
 private:
     Mountable *findNearestUnmountedMountable(const QPointF &pos, qreal distance_threshold = std::numeric_limits<qreal>::max());
     static Mountable * pickupMountable(Character *character, Mountable *mountable);
+    
+    // 新增：战斗相关辅助函数
+    bool isInAttackRange(Character* attacker, Character* target, qreal range = 100.0);
 
     Map *map;
     Character *character;
+    Character *enemy;
     Armor *spareArmor;
+    
+    // 新增：攻击按键状态
+    bool attackKeyDown{false};
 };
 
 #endif //QT_PROGRAMMING_2024_BATTLESCENE_H

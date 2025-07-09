@@ -180,11 +180,68 @@ void Character::setWeapon(Weapon* newWeapon) {
     weapon = newWeapon;
 }
 
+// 在现有的武器相关方法后添加以下实现
+
 void Character::performAttack() {
     if (weapon != nullptr) {
         weapon->attack(this);
     } else {
         qDebug() << "No weapon equipped, cannot attack!";
     }
+}
+
+// 新增：获取所持武器攻击范围的函数
+qreal Character::getWeaponAttackRange() const {
+    if (weapon != nullptr) {
+        return weapon->getAttackRange();
+    } else {
+        // 如果没有武器，返回默认的近身攻击范围
+        qDebug() << "No weapon equipped, using default attack range";
+        return 50.0; // 默认近身攻击范围50像素
+    }
+}
+
+// 在文件末尾添加以下方法实现
+
+// 生命值系统实现
+int Character::getHealth() const {
+    return health;
+}
+
+int Character::getMaxHealth() const {
+    return maxHealth;
+}
+
+bool Character::isDead() const {
+    return dead;
+}
+
+void Character::setHealth(int health) {
+    this->health = qBound(0, health, maxHealth);
+    if (this->health <= 0) {
+        dead = true;
+        this->health = 0;
+    } else {
+        dead = false;
+    }
+}
+
+void Character::takeDamage(int damage) {
+    if (dead) return; // 已死亡则不再受伤
+    
+    health -= damage;
+    if (health <= 0) {
+        health = 0;
+        dead = true;
+        qDebug() << "Character died!";
+    }
+    qDebug() << "Character took" << damage << "damage, health:" << health;
+}
+
+void Character::heal(int amount) {
+    if (dead) return; // 已死亡则无法治疗
+    
+    health = qMin(health + amount, maxHealth);
+    qDebug() << "Character healed" << amount << "health, current health:" << health;
 }
 

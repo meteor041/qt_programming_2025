@@ -19,9 +19,16 @@ Weapon::Weapon(QGraphicsItem *parent, const QString &attackPower)
     }
 }
 
+// 在现有代码基础上添加以下方法实现
+
 // 获取攻击力
 int Weapon::getAttackPower() const {
     return attackPower;
+}
+
+// 新增：获取攻击范围
+qreal Weapon::getAttackRange() const {
+    return attackRange;
 }
 
 // 攻击方法实现

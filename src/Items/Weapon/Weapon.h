@@ -12,11 +12,16 @@ public:
     explicit Weapon(QGraphicsItem *parent, const QString &attackPower);
 
     [[nodiscard]] int getAttackPower() const;
+    
+    // 新增：获取攻击范围的getter函数
+    [[nodiscard]] qreal getAttackRange() const;
 
     void attack(Character *attacker);
 
 protected:
     int attackPower;
+    // 新增：攻击范围属性
+    qreal attackRange{100.0};  // 默认攻击范围为100像素
 };
 
 #endif

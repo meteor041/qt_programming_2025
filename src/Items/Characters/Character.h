@@ -61,8 +61,17 @@ public:
     Weapon* getWeapon() const;
     void setWeapon(Weapon* newWeapon);
     void performAttack();
-
-
+    
+    // 新增：获取所持武器攻击范围的函数
+    [[nodiscard]] qreal getWeaponAttackRange() const;
+    
+    // 新增：生命值系统
+    [[nodiscard]] int getHealth() const;
+    [[nodiscard]] int getMaxHealth() const;
+    [[nodiscard]] bool isDead() const;
+    void setHealth(int health);
+    void takeDamage(int damage);
+    void heal(int amount);
 
 protected:
     HeadEquipment *headEquipment{};
@@ -90,6 +99,10 @@ private:
 
 
 
+    // 新增：生命值相关变量
+    int health{100};           // 当前生命值
+    int maxHealth{100};        // 最大生命值
+    bool dead{false};          // 是否死亡
 };
 
 
