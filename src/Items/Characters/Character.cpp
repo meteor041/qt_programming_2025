@@ -62,6 +62,7 @@ void Character::setVelocity(const QPointF &velocity) {
 }
 
 void Character::processInput() {
+
     // 1. 获取当前速度，我们不再重置它，而是在它的基础上修改
     QPointF currentVelocity = getVelocity();
 
@@ -94,7 +95,9 @@ void Character::processInput() {
 
     // 5. 处理拾取逻辑 (保持不变)
     // 调试输出
+
     // qDebug() << "Character velocity:" << velocity;
+
     if (!lastPickDown && pickDown) { // first time pickDown
         picking = true;
     } else {

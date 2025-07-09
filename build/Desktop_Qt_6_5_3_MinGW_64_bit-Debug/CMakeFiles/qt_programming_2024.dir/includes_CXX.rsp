@@ -1,1 +1,0 @@
--isystem "E:/Qt/assistant_work/qt-programming-2025/build/Desktop_Qt_6_5_3_MinGW_64_bit-Debug/qt_programming_2024_autogen/include" -isystem F:/Qt/6.5.3/mingw_64/include/QtCore -isystem F:/Qt/6.5.3/mingw_64/include -isystem "F:/Qt/6.5.3/mingw_64/mkspecs/win32-g++" -isystem F:/Qt/6.5.3/mingw_64/include/QtGui -isystem F:/Qt/6.5.3/mingw_64/include/QtWidgets

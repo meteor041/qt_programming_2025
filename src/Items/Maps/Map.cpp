@@ -89,3 +89,8 @@ QPointF Map::getSpawnPos() {
 
     return {spawnX, spawnY - 50}; // 在平台上方一点出生，然后自然下落
 }
+
+// 新增函数：获取所有平台的列表
+const QList<Platform*>& Map::getPlatforms() const {
+    return m_platforms;
+}
