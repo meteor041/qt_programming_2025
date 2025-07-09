@@ -9,6 +9,7 @@
 #include "../HeadEquipments/HeadEquipment.h"
 #include "../Armors/Armor.h"
 #include "../LegEquipments/LegEquipment.h"
+#include <QPixmap>
 
 class Character : public Item {
 public:
@@ -30,6 +31,14 @@ public:
 
     void setOnGround(bool onGround);
 
+    //新增的下蹲函数
+    [[nodiscard]] bool isCrouchDown() const;
+
+    void setCrouchDown(bool crouchDown);
+
+    [[nodiscard]] bool isCrouching() const;
+    //下蹲函数止
+
     [[nodiscard]] bool isPickDown() const;
 
     void setPickDown(bool pickDown);
@@ -42,7 +51,12 @@ public:
 
     void processInput();
 
+    // 【新增】一个更新角色状态和外观的私有函数（实现下蹲功能时添加）
+    void updateAppearanceAndState();
+
     Armor* pickupArmor(Armor* newArmor);
+
+
 
 protected:
     HeadEquipment *headEquipment{};
@@ -54,10 +68,21 @@ private:
     bool leftDown{}, rightDown{}, pickDown{}, jumpDown{}, onGround{};
     bool lastPickDown{};
     bool picking{};
+    //下蹲_按键是否按下
+    bool crouchDown{};
+    //角色是否处于下蹲的最终状态
+    bool crouching{};
     
     // 跳跃计时器相关变量
     int jumpCooldownTimer{0};        // 跳跃冷却计时器
     static const int JUMP_COOLDOWN_FRAMES = 30; // 跳跃冷却帧数（约0.33秒，假设90FPS）
+    QPixmap standingPixmap;//站立时的照片
+    QPixmap crouchingPixmap;//下蹲时的照片
+    qreal standingHeight;//站立照片高度
+    qreal crouchingHeight;//下蹲照片高度
+
+
+
 };
 
 

@@ -122,7 +122,7 @@ void BattleScene::processMovement() {
         QRectF charRect = character->boundingRect();
 
         // 应用边界限制
-        newPos.setX(qBound(0.0, newPos.x(), bounds.width() - charRect.width()));
+        newPos.setX(qBound(20.0, newPos.x(), bounds.width() - charRect.width()));
         // (Y轴边界可以暂时放宽，因为平台会阻止下落)
         newPos.setY(qBound(0.0, newPos.y(), bounds.height()));
 
@@ -191,6 +191,11 @@ void BattleScene::processInput() {
 }
 
 void BattleScene::keyPressEvent(QKeyEvent *event) {
+    // 阻止重复触发
+    if (event->isAutoRepeat()) {
+        return;
+    }
+
     switch (event->key()) {
     case Qt::Key_A:
         if (character) character->setLeftDown(true);
@@ -198,14 +203,20 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_D:
         if (character) character->setRightDown(true);
         break;
-    case Qt::Key_J:
-        if (character) character->setPickDown(true);
+
+    // --- 【核心改动 C1】修改拾取键，并添加下蹲键 ---
+    case Qt::Key_S: // 使用S键作为下蹲和拾取的复合键
+        if (character) {
+            character->setPickDown(true);   // 意图：拾取
+            character->setCrouchDown(true); // 意图：下蹲
+        }
         break;
+
     case Qt::Key_W:
     case Qt::Key_Space:
-        if (character) {
-            // 只有在地面上 (`isOnGround()` 为真) 才能设置跳跃标志
-            if (character->isOnGround()) {
+        if (character && character->isOnGround()) {
+            // 【修改】下蹲时不能跳跃
+            if (!character->isCrouching()) {
                 character->setJumpDown(true);
             }
         }
@@ -216,6 +227,10 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
 }
 
 void BattleScene::keyReleaseEvent(QKeyEvent *event) {
+    if (event->isAutoRepeat()) {
+        return;
+    }
+
     switch (event->key()) {
     case Qt::Key_A:
         if (character) character->setLeftDown(false);
@@ -223,9 +238,15 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
     case Qt::Key_D:
         if (character) character->setRightDown(false);
         break;
-    case Qt::Key_J:
-        if (character) character->setPickDown(false);
+
+    // --- 【核心改动 C2】同步修改松开事件 ---
+    case Qt::Key_S: // 松开S键
+        if (character) {
+            character->setPickDown(false);
+            character->setCrouchDown(false);
+        }
         break;
+
     case Qt::Key_W:
     case Qt::Key_Space:
         if (character) character->setJumpDown(false);
