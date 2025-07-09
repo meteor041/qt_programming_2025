@@ -55,6 +55,12 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Items/Maps/platform/GrassPlatform.cpp
         src/Items/Maps/platform/IcePlatform.h
         src/Items/Maps/platform/IcePlatform.cpp
+        src/Items/Weapon/Weapon.cpp
+        src/Items/Weapon/Weapon.h
+        src/Items/Weapon/Fist.cpp
+        src/Items/Weapon/Fist.h
+        src/Items/Weapon/Knife.cpp
+        src/Items/Weapon/Knife.h
 
 )
 target_link_libraries(qt_programming_2024

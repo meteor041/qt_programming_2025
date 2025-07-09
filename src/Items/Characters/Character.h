@@ -9,6 +9,7 @@
 #include "../HeadEquipments/HeadEquipment.h"
 #include "../Armors/Armor.h"
 #include "../LegEquipments/LegEquipment.h"
+#include "../Weapon/Weapon.h"
 #include <QPixmap>
 
 class Character : public Item {
@@ -55,6 +56,11 @@ public:
     void updateAppearanceAndState();
 
     Armor* pickupArmor(Armor* newArmor);
+    
+    // 武器相关方法
+    Weapon* getWeapon() const;
+    void setWeapon(Weapon* newWeapon);
+    void performAttack();
 
 
 
@@ -62,6 +68,7 @@ protected:
     HeadEquipment *headEquipment{};
     LegEquipment *legEquipment{};
     Armor *armor{};
+    Weapon *weapon{};  // 当前装备的武器
     QPointF velocity{};
    QGraphicsEllipseItem *ellipseItem; // for debugging
 private:

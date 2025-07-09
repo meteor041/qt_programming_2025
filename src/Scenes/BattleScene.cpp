@@ -177,6 +177,7 @@ void BattleScene::processMovement() {
                         }
                     }
                 }
+                qDebug() << "垂直重叠" << currentCharRect << newCharRect << platformRect;
                 
                 // 3. 左右侧碰撞检测（新增）
                 if (verticalOverlap) {

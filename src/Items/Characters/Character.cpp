@@ -4,6 +4,7 @@
 
 #include <QTransform>
 #include "Character.h"
+#include "../Weapon/Fist.h"
 #include <QDebug>
 
 Character::Character(QGraphicsItem *parent) : Item(parent, ":/Biker_basic.png") {
@@ -11,6 +12,9 @@ Character::Character(QGraphicsItem *parent) : Item(parent, ":/Biker_basic.png") 
    // Optionally, set some properties of the ellipse
    ellipseItem->setBrush(Qt::green);          // Fill color
    ellipseItem->setZValue(1);
+   
+   // 初始化默认武器：拳头
+   weapon = new Fist(this);
 }
 
 bool Character::isLeftDown() const {
@@ -153,5 +157,34 @@ Armor *Character::pickupArmor(Armor *newArmor) {
     newArmor->mountToParent();
     armor = newArmor;
     return oldArmor;
+}
+
+// 武器相关方法实现
+Weapon* Character::getWeapon() const {
+    return weapon;
+}
+
+void Character::setWeapon(Weapon* newWeapon) {
+    if (weapon != nullptr && weapon != newWeapon) {
+        // 卸载当前武器
+        weapon->unmount();
+        weapon->setParentItem(parentItem());
+    }
+    
+    if (newWeapon != nullptr) {
+        // 装备新武器
+        newWeapon->setParentItem(this);
+        newWeapon->mountToParent();
+    }
+    
+    weapon = newWeapon;
+}
+
+void Character::performAttack() {
+    if (weapon != nullptr) {
+        weapon->attack(this);
+    } else {
+        qDebug() << "No weapon equipped, cannot attack!";
+    }
 }
 
