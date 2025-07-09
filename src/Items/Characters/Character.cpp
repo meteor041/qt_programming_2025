@@ -6,11 +6,46 @@
 #include "Character.h"
 #include <QDebug>
 
-Character::Character(QGraphicsItem *parent) : Item(parent, ":/Biker_basic.png") {
-   ellipseItem = new QGraphicsEllipseItem(-5, -5, 10, 10, this);
-   // Optionally, set some properties of the ellipse
-   ellipseItem->setBrush(Qt::green);          // Fill color
-   ellipseItem->setZValue(1);
+// 【核心修改 B1】修改构造函数
+Character::Character(QGraphicsItem *parent)
+    // 1. 调用基类构造函数，给它一个默认的、将被隐藏的图片
+    : Item(parent, ":/Biker_basic.png")
+{
+    // 2. 隐藏基类创建的图形
+    if (this->pixmapItem) { // this->pixmapItem 是从 Item 继承来的
+        this->pixmapItem->setVisible(false);
+    }
+
+    // 3. 加载 Character 自己需要的图片资源
+    standingPixmap.load(":/Biker_basic.png");
+    crouchingPixmap.load(":/Biker_crouch.png");
+
+    if (crouchingPixmap.isNull()) {
+        qDebug() << "Warning: Crouching pixmap not found.";
+        crouchingPixmap = standingPixmap;
+    }
+
+    // 4. 缓存高度信息
+    standingHeight = standingPixmap.height();
+    crouchingHeight = crouchingPixmap.height();
+
+    // 5. 创建并管理 Character 自己的图形项
+    characterPixmapItem = new QGraphicsPixmapItem(this); // 设为this的子项
+    characterPixmapItem->setPixmap(standingPixmap);     // 设置初始外观
+
+    // (调试用椭圆，保持不变)
+    ellipseItem = new QGraphicsEllipseItem(-5, -5, 10, 10, this);
+    ellipseItem->setBrush(Qt::green);
+    ellipseItem->setZValue(1);
+}
+
+QRectF Character::boundingRect() const {
+    // 返回我们自己管理的、可见的图形项的边界
+    if (characterPixmapItem) {
+        return characterPixmapItem->boundingRect();
+    }
+    // 作为备用，如果自己的图形项不存在，就返回一个空矩形
+    return {};
 }
 
 bool Character::isLeftDown() const {
@@ -119,21 +154,17 @@ void Character::processInput() {
 }
 
 void Character::updateAppearanceAndState() {
-    // 决定是否应该下蹲：当S键按下，并且本帧没有触发拾取动作时
     bool shouldCrouch = isCrouchDown() && !isPicking();
 
-    // 状态发生变化时，更新外观和位置
     if (shouldCrouch && !crouching) {
-        // 从 站立 -> 下蹲
         crouching = true;
-//        setPixmap(crouchingPixmap);
-        // 为了让脚底位置不变，身体需要向下移动 高度差 的距离
+        // 操作我们自己的 characterPixmapItem
+        characterPixmapItem->setPixmap(crouchingPixmap);
         setY(y() + (standingHeight - crouchingHeight));
     } else if (!shouldCrouch && crouching) {
-        // 从 下蹲 -> 站立
         crouching = false;
-//        setPixmap(standingPixmap);
-        // 恢复站立时，身体需要向上移动
+        // 操作我们自己的 characterPixmapItem
+        characterPixmapItem->setPixmap(standingPixmap);
         setY(y() - (standingHeight - crouchingHeight));
     }
 }

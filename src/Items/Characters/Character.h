@@ -10,10 +10,14 @@
 #include "../Armors/Armor.h"
 #include "../LegEquipments/LegEquipment.h"
 #include <QPixmap>
+#include "../Item.h" // 确保包含了Item.h
 
 class Character : public Item {
 public:
     explicit Character(QGraphicsItem *parent);
+
+    //由于character类需要保存很多图片，item类不应该修改，因此重写boundingRect
+     [[nodiscard]] QRectF boundingRect() const override;
 
     [[nodiscard]] bool isLeftDown() const;
 
@@ -51,9 +55,6 @@ public:
 
     void processInput();
 
-    // 【新增】一个更新角色状态和外观的私有函数（实现下蹲功能时添加）
-    void updateAppearanceAndState();
-
     Armor* pickupArmor(Armor* newArmor);
 
 
@@ -65,6 +66,12 @@ protected:
     QPointF velocity{};
    QGraphicsEllipseItem *ellipseItem; // for debugging
 private:
+   // 【核心修改 A2】新增一个专门由Character管理的 QGraphicsPixmapItem
+   QGraphicsPixmapItem *characterPixmapItem{};
+
+    // 【新增】一个更新角色状态和外观的私有函数（实现下蹲功能时添加）
+    void updateAppearanceAndState();
+
     bool leftDown{}, rightDown{}, pickDown{}, jumpDown{}, onGround{};
     bool lastPickDown{};
     bool picking{};
