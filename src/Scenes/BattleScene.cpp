@@ -400,32 +400,42 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
     }
 }
 
-// 新增：战斗处理函数
-void BattleScene::processCombat() {
-    if (!character || !enemy || character->isDead()) {
+// 【新增】处理单个角色攻击的辅助函数
+void BattleScene::processCharacterCombat(Character* attacker, Character* target, bool& attackFlag) {
+    if (!attacker || !target || !attackFlag || attacker->isDead()) {
         return;
     }
-    
-    // 处理角色攻击
-    if (attackKeyDown) {
-        // 检查敌人是否在攻击范围内
-        if (isInAttackRange(character, enemy, character->getWeaponAttackRange())) {
-            // 执行攻击
-            character->performAttack();
-            
-            // 对敌人造成伤害（这里设定基础伤害为20）
-            int damage = 20;
-            enemy->takeDamage(damage);
-            
-            qDebug() << "Character attacked enemy! Enemy health:" << enemy->getHealth();
-        } else {
-            qDebug() << "Enemy is too far to attack!";
-        }
-        
-        // 重置攻击状态，避免连续攻击
-        attackKeyDown = false;
+
+    // 检查目标是否在攻击范围内
+    if (isInAttackRange(attacker, target, attacker->getWeaponAttackRange())) {
+        // 执行攻击动画/效果
+        attacker->performAttack();
+
+        // 从武器获取伤害值
+        int damage = attacker->getWeapon()->getAttackPower();
+        target->takeDamage(damage);
+
+ //       qDebug() << attacker->metaObject()->className() << "attacked" << target->metaObject()->className()
+//                 << "for" << damage << "damage! Target health:" << target->getHealth();
+    } else {
+ //       qDebug() << attacker->metaObject()->className() << "tried to attack, but target is too far!";
     }
+
+    // 重置攻击状态，实现单次按下、单次攻击
+    attackFlag = false;
 }
+
+// BattleScene.cpp
+
+// 【改动】重构战斗处理函数，使其对称并可复用
+void BattleScene::processCombat() {
+    // 处理玩家1对玩家2的攻击
+    processCharacterCombat(character, enemy, attackKeyDown);
+
+    // 处理玩家2对玩家1的攻击
+    processCharacterCombat(enemy, character, enemyAttackKeyDown);
+}
+
 
 // 新增：检查攻击范围的辅助函数
 bool BattleScene::isInAttackRange(Character* attacker, Character* target, qreal range) {

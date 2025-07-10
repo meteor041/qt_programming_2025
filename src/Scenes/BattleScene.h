@@ -70,6 +70,8 @@ private:
     void processCharacterMovement(Character* aCharacter);
     // 【新增】用于处理单个角色拾取的辅助函数
     void processCharacterPicking(Character* aCharacter);
+    // 【新增】用于处理单个角色攻击逻辑的辅助函数
+    void processCharacterCombat(Character* attacker, Character* target, bool& attackFlag);
 
 
     Map *map;
