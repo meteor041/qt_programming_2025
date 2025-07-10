@@ -13,6 +13,9 @@
 #include <QPixmap>
 #include "../Item.h" // 确保包含了Item.h
 
+// 前向声明 Platform 类，避免循环引用
+class Platform;
+
 //人物状态，用于动画显示
 enum CharacterState {
     Standing,
@@ -63,6 +66,14 @@ public:
     void setVelocity(const QPointF &velocity);
 
     void processInput();
+
+    // --- 【核心改动 1】: 添加被平台调用的公共方法 ---
+    void setSpeedMultiplier(qreal multiplier);
+    void setInStealth(bool stealth);
+
+    // --- 【核心改动 2】: 用于在 BattleScene 中追踪平台状态 ---
+    Platform* getCurrentPlatform() const;
+    void setCurrentPlatform(Platform* platform);
 
     Armor* pickupArmor(Armor* newArmor);
     
@@ -118,6 +129,11 @@ private:
 
     qreal standingHeight;
     qreal crouchingHeight;
+
+    // --- 【核心改动 3】: 添加存储平台效果的私有成员变量 ---
+    qreal m_speedMultiplier{1.0}; // 速度倍率，默认为1倍
+    bool m_isInStealth{false};      // 是否处于隐身状态，默认为否
+    Platform* m_currentPlatform{nullptr}; // 指向当前所在平台的指针
 
     // 新增：生命值相关变量
     int health{100};           // 当前生命值

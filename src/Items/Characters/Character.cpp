@@ -142,6 +142,28 @@ void Character::setVelocity(const QPointF &velocity) {
     Character::velocity = velocity;
 }
 
+// --- 【核心改动 1】: 实现新增的公共方法 ---
+void Character::setSpeedMultiplier(qreal multiplier) {
+    m_speedMultiplier = multiplier;
+}
+
+void Character::setInStealth(bool stealth) {
+    // 只有在状态改变时才打印，避免刷屏
+    if (m_isInStealth != stealth) {
+        m_isInStealth = stealth;
+        qDebug() << "Character stealth status:" << m_isInStealth;
+    }
+}
+
+Platform* Character::getCurrentPlatform() const {
+    return m_currentPlatform;
+}
+
+void Character::setCurrentPlatform(Platform* platform) {
+    m_currentPlatform = platform;
+}
+
+
 void Character::processInput() {
     // 1. 处理拾取状态 (这必须在最前面，以决定本帧是否在执行拾取动作)
     if (!lastPickDown && pickDown) {
@@ -167,11 +189,11 @@ void Character::processInput() {
         qreal targetHorizontalVelocity = 0;
 
         if (isLeftDown()) {
-            targetHorizontalVelocity = -moveSpeed;
+            targetHorizontalVelocity = -moveSpeed * m_speedMultiplier;
             setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(-1, 1));
         } else if (isRightDown()) {
-            targetHorizontalVelocity = moveSpeed;
+            targetHorizontalVelocity = moveSpeed * m_speedMultiplier;
             setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(1, 1));
         }
@@ -232,6 +254,8 @@ void Character::updateAppearanceAndState() {
                 characterPixmapItem->setPixmap(jumpingAnimationFrames[0]);
             }
             break;
+        default:
+            break;
         }
     }
 
@@ -261,6 +285,13 @@ void Character::updateAppearanceAndState() {
     case Standing:
     case Crouching:
         break;
+    }
+    if (m_isInStealth) {
+        // 如果处于隐身状态，设置半透明效果
+        this->setOpacity(0.4); // 0.2可能太透明了，可以调整为0.4试试
+    } else {
+        // 否则，恢复完全不透明
+        this->setOpacity(1.0);
     }
 }
 

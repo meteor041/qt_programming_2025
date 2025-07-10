@@ -53,66 +53,75 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
 }
 
 // 【核心改动 #3】实现物理处理逻辑 (修正版)
-void BattleScene::processPhysics() {
+// 【推荐】创建一个辅助函数（未在头文件声明，仅用于本文件）来处理单个角色的物理和平台事件，避免对于不同角色代码重复
+void processCharacterPhysicsAndEvents(Character* character, Map* map) {
     if (!character || !map) {
         return;
     }
 
-    // 定义物理常量
+    // --- 物理计算部分 (保持不变) ---
     const qreal GRAVITY = 0.8;
     const qreal MAX_FALL_SPEED = 20.0;
-
-    //定义误差量，由于图片更新大小导致
-    const qreal GROUND_TOLERANCE = 2.0;
-    // --- 步骤 1: 应用重力 ---
     QPointF currentVelocity = character->getVelocity();
     currentVelocity.setY(currentVelocity.y() + GRAVITY);
-
-
     if (currentVelocity.y() > MAX_FALL_SPEED) {
         currentVelocity.setY(MAX_FALL_SPEED);
     }
-    // 注意：我们暂时不把速度设置回去，因为如果发生碰撞，速度会被重置。
 
-    // --- 步骤 2: 碰撞检测与解决 ---
+    // --- 碰撞检测部分 (保持不变) ---
     bool onGroundThisFrame = false;
-
     QRectF charRect = character->boundingRect();
-    // 查找角色当前位置下方的最高平台
-    Platform* ground = map->getGroundPlatform(character->pos(), charRect.height());
+    Platform* groundThisFrame = map->getGroundPlatform(character->pos(), charRect.height());
 
-    if (ground != nullptr) {
-        qreal surfaceY = ground->getSurfaceY();
-
-        // 获取角色脚部在【当前帧开始时】的位置
+    if (groundThisFrame != nullptr) {
+        qreal surfaceY = groundThisFrame->getSurfaceY();
         qreal footY_current = character->pos().y() + charRect.height();
-
-        // 预测角色脚部在【当前帧结束时】的位置 (如果没有任何碰撞)
         qreal footY_next = footY_current + currentVelocity.y();
 
-        // 【！！！核心修复！！！】
-        // 新的碰撞条件：
-        // 1. 角色正在下落 (velocity >= 0)。
-        // 2. 在本帧开始时，脚还在平台上方。
-        // 3. 在本帧移动后，脚将会移动到平台下方。
-        // 这段逻辑能够捕捉到“穿越”平台表面的瞬间，无论速度有多快！
         if (currentVelocity.y() >= 0 && footY_current <= surfaceY && footY_next >= surfaceY) {
-
-            // --- 碰撞解决！---
-            // 发生了碰撞，将角色精确地放在平台表面
             character->setY(surfaceY - charRect.height());
-
-            // 垂直速度清零
             currentVelocity.setY(0);
-
-            // 标记角色已在地面上
             onGroundThisFrame = true;
         }
     }
 
-    // --- 步骤 3: 更新最终的速度和状态 ---
+    // --- 【核心改动】平台事件驱动逻辑 ---
+    Platform* lastFramePlatform = character->getCurrentPlatform();
+
+    // 1. 检查平台是否发生变化
+    if (groundThisFrame != lastFramePlatform) {
+        // 触发 "离开" 事件
+        if (lastFramePlatform) {
+            lastFramePlatform->onCharacterLeave(character);
+        }
+        // 触发 "进入" 事件
+        if (groundThisFrame) {
+            groundThisFrame->onCharacterEnter(character);
+        }
+    }
+
+    // 2. 如果角色在某个平台上，则每帧触发 "停留" 事件
+    if (groundThisFrame) {
+        groundThisFrame->onCharacterStay(character);
+    }
+
+    // 3. 更新角色当前所在的平台记录
+    character->setCurrentPlatform(groundThisFrame);
+
+
+    // --- 更新最终速度和状态 (保持不变) ---
     character->setVelocity(currentVelocity);
     character->setOnGround(onGroundThisFrame);
+}
+
+
+// 【修改】processPhysics 函数，使其调用新的辅助函数
+void BattleScene::processPhysics() {
+    // 为玩家角色处理
+    processCharacterPhysicsAndEvents(character, map);
+
+    // 为敌人角色处理
+    processCharacterPhysicsAndEvents(enemy, map);
 }
 
 
