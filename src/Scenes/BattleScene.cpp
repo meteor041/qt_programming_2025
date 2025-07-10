@@ -32,23 +32,23 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     addItem(enemy);
     enemy->setScale(1.0);
     enemy->setZValue(10);
-    enemy->setPos(spawnPos.x() - 200, spawnPos.y());
-    // 创建备用盔甲
-    spareArmor = new FlamebreakerArmor();
-    addItem(spareArmor);
-    spareArmor->unmount();
+    // 将玩家2放置在场景右侧，与玩家1对称
+    enemy->setPos(sceneRect().width() - spawnPos.x() - enemy->boundingRect().width(), spawnPos.y());
+    // 【改动】使用局部变量创建初始盔甲，不再使用成员变量 spareArmor
+    Armor* initialArmor = new FlamebreakerArmor();
+    addItem(initialArmor);
+    initialArmor->unmount();
 
-    // 【核心改动 #2】修复盔甲的放置位置
-    // 我们不能再使用 getFloorHeight()，而是要找到一个平台来放置它
+    // 将盔甲放置在场景中央的平台上
     QPointF armorTargetPos(sceneRect().center().x() + 200, 0); // 设定一个目标水平位置
-    Platform* groundForArmor = map->getGroundPlatform(armorTargetPos, spareArmor->boundingRect().height());
+    Platform* groundForArmor = map->getGroundPlatform(armorTargetPos, initialArmor->boundingRect().height());
     if (groundForArmor) {
         // 如果找到了平台，将盔甲放在平台表面上方
-        spareArmor->setPos(armorTargetPos.x(),
-                           groundForArmor->getSurfaceY() - spareArmor->boundingRect().height());
+        initialArmor->setPos(armorTargetPos.x(),
+                             groundForArmor->getSurfaceY() - initialArmor->boundingRect().height());
     } else {
         // 如果没找到平台（作为备用方案），放在一个安全的位置
-        spareArmor->setPos(sceneRect().center());
+        initialArmor->setPos(sceneRect().center());
     }
     
     // 初始化血条UI
@@ -56,8 +56,9 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
 }
 
 // 【核心改动 #3】实现物理处理逻辑 (修正版)
-// 【推荐】创建一个辅助函数（未在头文件声明，仅用于本文件）来处理单个角色的物理和平台事件，避免对于不同角色代码重复
-void processCharacterPhysicsAndEvents(Character* character, Map* map) {
+// 【推荐】创建一个辅助函数（未在头文件声明，仅用于本文件）来处理单个角色的物理和平台事件
+//  避免对于不同角色代码重复
+static void processCharacterPhysicsAndEvents(Character* character, Map* map) {
     if (!character || !map) {
         return;
     }
@@ -131,131 +132,148 @@ void BattleScene::processPhysics() {
 // --- 以下是其他函数的代码，大部分保持不变 ---
 
 // 这个函数现在只负责应用最终计算出的速度来移动角色
-void BattleScene::processMovement() {
-    if (character != nullptr) {
-        // deltaTime/1000.0 将毫秒转换为秒
-        // 在我们的帧同步模型里，可以简化为直接应用速度
-        QPointF newPos = character->pos() + character->getVelocity();
+// 【新增】用于处理单个角色移动的辅助函数，避免代码重复
+// 这个函数现在只负责应用最终计算出的速度来移动角色
+void BattleScene::processCharacterMovement(Character* aCharacter) {
+    // 检查传入的指针是否有效
+    if (aCharacter == nullptr) {
+        return;
+    }
 
-        // 获取边界
-        QRectF bounds = sceneRect();
-        QRectF charRect = character->boundingRect();
+    // 在我们的帧同步模型里，可以简化为直接应用速度
+    QPointF newPos = aCharacter->pos() + aCharacter->getVelocity();
 
-        // 应用边界限制
-        newPos.setX(qBound(20.0, newPos.x(), bounds.width() - charRect.width()));
-        // (Y轴边界可以暂时放宽，因为平台会阻止下落)
-        newPos.setY(qBound(0.0, newPos.y(), bounds.height()));
+    // 获取边界
+    QRectF bounds = sceneRect();
+    QRectF charRect = aCharacter->boundingRect();
 
-        // 平台碰撞检测：检查角色是否会穿过平台
-        if (map) {
-            // 直接遍历所有平台进行碰撞检测
-            for (Platform* platform : map->getPlatforms()) {
-                QRectF platformRect = platform->sceneBoundingRect();
-                
-                // 计算角色当前和新位置的边界框
-                QRectF currentCharRect(character->pos(), charRect.size());
-                QRectF newCharRect(newPos, charRect.size());
-                
-                // 检查水平范围是否重叠
-                bool horizontalOverlap = (newCharRect.right() > platformRect.left() && 
-                                         newCharRect.left() < platformRect.right());
-                
-                // 检查垂直范围是否重叠
-                bool verticalOverlap = newCharRect.intersects(platformRect);
-                
-                if (horizontalOverlap) {
-                    // 1. 底部碰撞检测（角色下落撞到平台顶部）
-                    if (character->getVelocity().y() > 0) { // 角色正在下落
-                        qreal currentBottom = currentCharRect.bottom();
-                        qreal newBottom = newCharRect.bottom();
-                        qreal platformTop = platformRect.top();
-                        
-                        // 检查是否从平台上方穿过平台顶部
-                        if (currentBottom <= platformTop && newBottom > platformTop) {
-                            // 将角色位置限制在平台表面上方
-                            newPos.setY(platformTop - charRect.height());
-                            // 停止垂直速度（着陆）
-                            character->setVelocity(QPointF(character->getVelocity().x(), 0));
-                            break; // 找到碰撞就停止检查其他平台
-                        }
-                    }
-                    
-                    // 2. 头部碰撞检测（角色向上跳跃撞到平台底部）
-                    else if (character->getVelocity().y() < 0) { // 角色正在上升
-                        qreal currentTop = currentCharRect.top();
-                        qreal newTop = newCharRect.top();
-                        qreal platformBottom = platformRect.bottom();
-                        
-                        // 检查是否从平台下方撞到平台底部
-                        if (currentTop >= platformBottom && newTop < platformBottom) {
-                            // 将角色位置限制在平台底部下方
-                            newPos.setY(platformBottom);
-                            // 反转Y轴速度（向下弹回）
-                            character->setVelocity(QPointF(character->getVelocity().x(), -character->getVelocity().y()));
-                            break; // 找到碰撞就停止检查其他平台
-                        }
+    // 应用边界限制
+    newPos.setX(qBound(20.0, newPos.x(), bounds.width() - charRect.width()));
+    // (Y轴边界可以暂时放宽，因为平台会阻止下落)
+    newPos.setY(qBound(0.0, newPos.y(), bounds.height()));
+
+    // 平台碰撞检测：检查角色是否会穿过平台
+    if (map) {
+        // 直接遍历所有平台进行碰撞检测
+        for (Platform* platform : map->getPlatforms()) {
+            QRectF platformRect = platform->sceneBoundingRect();
+
+            // 计算角色当前和新位置的边界框
+            QRectF currentCharRect(aCharacter->pos(), charRect.size());
+            QRectF newCharRect(newPos, charRect.size());
+
+            // 检查水平范围是否重叠
+            bool horizontalOverlap = (newCharRect.right() > platformRect.left() &&
+                                      newCharRect.left() < platformRect.right());
+
+            // 检查垂直范围是否重叠
+            bool verticalOverlap = newCharRect.intersects(platformRect);
+
+            if (horizontalOverlap) {
+                // 1. 底部碰撞检测（角色下落撞到平台顶部）
+                if (aCharacter->getVelocity().y() > 0) { // 角色正在下落
+                    qreal currentBottom = currentCharRect.bottom();
+                    qreal newBottom = newCharRect.bottom();
+                    qreal platformTop = platformRect.top();
+
+                    // 检查是否从平台上方穿过平台顶部
+                    if (currentBottom <= platformTop && newBottom > platformTop) {
+                        // 将角色位置限制在平台表面上方
+                        newPos.setY(platformTop - charRect.height());
+                        // 停止垂直速度（着陆）
+                        aCharacter->setVelocity(QPointF(aCharacter->getVelocity().x(), 0));
+                        break; // 找到碰撞就停止检查其他平台
                     }
                 }
-                // qDebug() << "垂直重叠" << currentCharRect << newCharRect << platformRect;
-                
-                // 3. 左右侧碰撞检测（新增）
-                if (verticalOverlap) {
-                    qDebug() << "vertical overlap";
-                    // 左侧碰撞检测（角色从左侧撞到平台）
-                    if (character->getVelocity().x() > 0) { // 角色正在向右移动
-                        qreal currentRight = currentCharRect.right();
-                        qreal newRight = newCharRect.right();
-                        qreal platformLeft = platformRect.left();
-                        
-                        // 检查是否从平台左侧穿过平台左边界
-                        if (currentRight <= platformLeft && newRight > platformLeft) {
-                            // 将角色位置限制在平台左侧
-                            newPos.setX(platformLeft - charRect.width());
-                            // 反转X轴速度
-                            character->setVelocity(QPointF(-character->getVelocity().x(), character->getVelocity().y()));
-                            break; // 找到碰撞就停止检查其他平台
-                        }
+
+                // 2. 头部碰撞检测（角色向上跳跃撞到平台底部）
+                else if (aCharacter->getVelocity().y() < 0) { // 角色正在上升
+                    qreal currentTop = currentCharRect.top();
+                    qreal newTop = newCharRect.top();
+                    qreal platformBottom = platformRect.bottom();
+
+                    // 检查是否从平台下方撞到平台底部
+                    if (currentTop >= platformBottom && newTop < platformBottom) {
+                        // 将角色位置限制在平台底部下方
+                        newPos.setY(platformBottom);
+                        // 反转Y轴速度（向下弹回）
+                        aCharacter->setVelocity(QPointF(aCharacter->getVelocity().x(), -aCharacter->getVelocity().y()));
+                        break; // 找到碰撞就停止检查其他平台
                     }
-                    
-                    // 右侧碰撞检测（角色从右侧撞到平台）
-                    else if (character->getVelocity().x() < 0) { // 角色正在向左移动
-                        qreal currentLeft = currentCharRect.left();
-                        qreal newLeft = newCharRect.left();
-                        qreal platformRight = platformRect.right();
-                        
-                        // 检查是否从平台右侧穿过平台右边界
-                        if (currentLeft >= platformRight && newLeft < platformRight) {
-                            // 将角色位置限制在平台右侧
-                            newPos.setX(platformRight);
-                            // 反转X轴速度
-                            character->setVelocity(QPointF(-character->getVelocity().x(), character->getVelocity().y()));
-                            break; // 找到碰撞就停止检查其他平台
-                        }
+                }
+            }
+            // qDebug() << "垂直重叠" << currentCharRect << newCharRect << platformRect;
+
+            // 3. 左右侧碰撞检测（新增）
+            if (verticalOverlap) {
+                // qDebug() << "vertical overlap"; // 如果需要调试，可以取消此行注释
+                // 左侧碰撞检测（角色从左侧撞到平台）
+                if (aCharacter->getVelocity().x() > 0) { // 角色正在向右移动
+                    qreal currentRight = currentCharRect.right();
+                    qreal newRight = newCharRect.right();
+                    qreal platformLeft = platformRect.left();
+
+                    // 检查是否从平台左侧穿过平台左边界
+                    if (currentRight <= platformLeft && newRight > platformLeft) {
+                        // 将角色位置限制在平台左侧
+                        newPos.setX(platformLeft - charRect.width());
+                        // 反转X轴速度
+                        aCharacter->setVelocity(QPointF(-aCharacter->getVelocity().x(), aCharacter->getVelocity().y()));
+                        break; // 找到碰撞就停止检查其他平台
+                    }
+                }
+
+                // 右侧碰撞检测（角色从右侧撞到平台）
+                else if (aCharacter->getVelocity().x() < 0) { // 角色正在向左移动
+                    qreal currentLeft = currentCharRect.left();
+                    qreal newLeft = newCharRect.left();
+                    qreal platformRight = platformRect.right();
+
+                    // 检查是否从平台右侧穿过平台右边界
+                    if (currentLeft >= platformRight && newLeft < platformRight) {
+                        // 将角色位置限制在平台右侧
+                        newPos.setX(platformRight);
+                        // 反转X轴速度
+                        aCharacter->setVelocity(QPointF(-aCharacter->getVelocity().x(), aCharacter->getVelocity().y()));
+                        break; // 找到碰撞就停止检查其他平台
                     }
                 }
             }
         }
-        
-        // 修改Y轴限制：不允许进入画面最下方120像素的区域
-        newPos.setY(qBound(0.0, newPos.y(), bounds.height() - charRect.height() - 120.0));
-        character->setPos(newPos);
     }
+
+    // 修改Y轴限制：不允许进入画面最下方120像素的区域
+    newPos.setY(qBound(0.0, newPos.y(), bounds.height() - charRect.height() - 120.0));
+    aCharacter->setPos(newPos);
+}
+
+// 【核心改动 #2】重构 processMovement 以调用通用函数
+void BattleScene::processMovement() {
+    processCharacterMovement(character); // 为玩家1处理移动
+    processCharacterMovement(enemy);     // 为玩家2处理移动
 }
 
 
+// processInput现在也需要为enemy调用
 void BattleScene::processInput() {
     Scene::processInput();
     if (character != nullptr) {
-        character->processInput(); // 假设角色内部会根据按键状态设置速度
+        character->processInput();
+    }
+    if (enemy != nullptr) {
+        enemy->processInput();
     }
 }
 
+// 【核心改动 #3】更新键盘按下事件以包含玩家2的控制
 void BattleScene::keyPressEvent(QKeyEvent *event) {
-    // 阻止重复触发
     if (event->isAutoRepeat()) {
         return;
     }
 
+    bool keyHandled = true; // 假设我们能处理这个按键
+
+    // --- 玩家1 (WASD/K) 控制 ---
     switch (event->key()) {
     case Qt::Key_A:
         if (character) character->setLeftDown(true);
@@ -263,40 +281,70 @@ void BattleScene::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_D:
         if (character) character->setRightDown(true);
         break;
-
-    // --- 【核心改动 C1】修改拾取键，并添加下蹲键 ---
-    case Qt::Key_S: // 使用S键作为下蹲和拾取的复合键
+    case Qt::Key_S:
         if (character) {
-            character->setPickDown(true);   // 意图：拾取
-            character->setCrouchDown(true); // 意图：下蹲
+            character->setPickDown(true);
+            character->setCrouchDown(true);
         }
         break;
-
     case Qt::Key_W:
     case Qt::Key_Space:
-        if (character && character->isOnGround()) {
-            // 【修改】下蹲时不能跳跃
-            if (!character->isCrouching()) {
-                character->setJumpDown(true);
-            }
+        if (character && character->isOnGround() && !character->isCrouching()) {
+            character->setJumpDown(true);
         }
         break;
-    // 新增：K键攻击
     case Qt::Key_K:
         if (character && !character->isDead()) {
             attackKeyDown = true;
         }
         break;
+    }
+
+    // --- 玩家2 (方向键/0) 控制 ---
+    switch (event->key()) {
+    case Qt::Key_Left:
+        if (enemy) enemy->setLeftDown(true);
+        break;
+    case Qt::Key_Right:
+        if (enemy) enemy->setRightDown(true);
+        break;
+    case Qt::Key_Down:
+        if (enemy) {
+            enemy->setPickDown(true);
+            enemy->setCrouchDown(true);
+        }
+        break;
+    case Qt::Key_Up:
+        if (enemy && enemy->isOnGround() && !enemy->isCrouching()) {
+            enemy->setJumpDown(true);
+        }
+        break;
+    case Qt::Key_0: // 数字键0
+        if (enemy && !enemy->isDead()) {
+            enemyAttackKeyDown = true;
+        }
+        break;
+        // --- 其他按键 ---
     default:
-        Scene::keyPressEvent(event);
+        keyHandled = false; // 我们不处理这个按键
+        break;
+    }
+
+    if (keyHandled) {
+        event->accept(); // 【重要】接受事件，阻止它传播到 QGraphicsView
+    } else {
+        Scene::keyPressEvent(event); // 如果不是我们的控制键，就交给基类处理
     }
 }
-
+// 【核心改动 #4】更新键盘释放事件以包含玩家2的控制
 void BattleScene::keyReleaseEvent(QKeyEvent *event) {
     if (event->isAutoRepeat()) {
         return;
     }
 
+    bool keyHandled = true; // 假设我们能处理这个按键
+
+    // --- 玩家1 (WASD/K) 控制 ---
     switch (event->key()) {
     case Qt::Key_A:
         if (character) character->setLeftDown(false);
@@ -304,25 +352,51 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
     case Qt::Key_D:
         if (character) character->setRightDown(false);
         break;
-
-    // --- 【核心改动 C2】同步修改松开事件 ---
-    case Qt::Key_S: // 松开S键
+    case Qt::Key_S:
         if (character) {
             character->setPickDown(false);
             character->setCrouchDown(false);
         }
         break;
-
     case Qt::Key_W:
     case Qt::Key_Space:
         if (character) character->setJumpDown(false);
         break;
-    // 新增：K键释放
     case Qt::Key_K:
         attackKeyDown = false;
         break;
+    }
+
+    // --- 玩家2 (方向键/0) 控制 ---
+    switch (event->key()) {
+    case Qt::Key_Left:
+        if (enemy) enemy->setLeftDown(false);
+        break;
+    case Qt::Key_Right:
+        if (enemy) enemy->setRightDown(false);
+        break;
+    case Qt::Key_Down:
+        if (enemy) {
+            enemy->setPickDown(false);
+            enemy->setCrouchDown(false);
+        }
+        break;
+    case Qt::Key_Up:
+        if (enemy) enemy->setJumpDown(false);
+        break;
+    case Qt::Key_0:
+        enemyAttackKeyDown = false;
+        break;
+        // --- 其他按键 ---
     default:
-        Scene::keyReleaseEvent(event);
+        keyHandled = false; // 我们不处理这个按键
+        break;
+    }
+
+    if (keyHandled) {
+        event->accept(); // 【重要】接受事件
+    } else {
+        Scene::keyReleaseEvent(event); // 交给基类处理
     }
 }
 
@@ -496,21 +570,21 @@ void BattleScene::initHealthBars() {
     // 角色血条（左上角）
     qreal characterBarX = 20;
     qreal characterBarY = 20;
-    
+
     // 角色血条背景
     characterHealthBarBg = new QGraphicsRectItem(characterBarX, characterBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
     characterHealthBarBg->setBrush(QBrush(Qt::darkRed));
     characterHealthBarBg->setPen(QPen(Qt::black, 2));
     characterHealthBarBg->setZValue(100);  // 确保在最前面
     addItem(characterHealthBarBg);
-    
+
     // 角色血条前景
     characterHealthBarFg = new QGraphicsRectItem(characterBarX, characterBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
     characterHealthBarFg->setBrush(QBrush(Qt::green));
     characterHealthBarFg->setPen(QPen(Qt::transparent));
     characterHealthBarFg->setZValue(101);
     addItem(characterHealthBarFg);
-    
+
     // 角色血量文字
     characterHealthText = new QGraphicsTextItem();
     characterHealthText->setPos(characterBarX, characterBarY + HEALTH_BAR_HEIGHT + 5);
@@ -518,25 +592,25 @@ void BattleScene::initHealthBars() {
     characterHealthText->setFont(QFont("Arial", 12, QFont::Bold));
     characterHealthText->setZValue(102);
     addItem(characterHealthText);
-    
+
     // 敌人血条（右上角）
     qreal enemyBarX = sceneRect().width() - HEALTH_BAR_WIDTH - 20;
     qreal enemyBarY = 20;
-    
+
     // 敌人血条背景
     enemyHealthBarBg = new QGraphicsRectItem(enemyBarX, enemyBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
     enemyHealthBarBg->setBrush(QBrush(Qt::darkRed));
     enemyHealthBarBg->setPen(QPen(Qt::black, 2));
     enemyHealthBarBg->setZValue(100);
     addItem(enemyHealthBarBg);
-    
+
     // 敌人血条前景
     enemyHealthBarFg = new QGraphicsRectItem(enemyBarX, enemyBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
     enemyHealthBarFg->setBrush(QBrush(Qt::red));
     enemyHealthBarFg->setPen(QPen(Qt::transparent));
     enemyHealthBarFg->setZValue(101);
     addItem(enemyHealthBarFg);
-    
+
     // 敌人血量文字
     enemyHealthText = new QGraphicsTextItem();
     enemyHealthText->setPos(enemyBarX, enemyBarY + HEALTH_BAR_HEIGHT + 5);
@@ -551,33 +625,33 @@ void BattleScene::updateHealthBars() {
     if (!character || !enemy) {
         return;
     }
-    
+
     // 更新角色血条
     int characterCurrentHealth = character->getHealth();
     int characterMaxHealth = character->getMaxHealth();
     qreal characterHealthRatio = static_cast<qreal>(characterCurrentHealth) / characterMaxHealth;
-    
+
     // 更新角色血条宽度
     QRectF characterRect = characterHealthBarFg->rect();
     characterRect.setWidth(HEALTH_BAR_WIDTH * characterHealthRatio);
     characterHealthBarFg->setRect(characterRect);
-    
+
     // 更新角色血量文字
     characterHealthText->setPlainText(QString("Player: %1/%2").arg(characterCurrentHealth).arg(characterMaxHealth));
-    
+
     // 更新敌人血条
     int enemyCurrentHealth = enemy->getHealth();
     int enemyMaxHealth = enemy->getMaxHealth();
     qreal enemyHealthRatio = static_cast<qreal>(enemyCurrentHealth) / enemyMaxHealth;
-    
+
     // 更新敌人血条宽度
     QRectF enemyRect = enemyHealthBarFg->rect();
     enemyRect.setWidth(HEALTH_BAR_WIDTH * enemyHealthRatio);
     enemyHealthBarFg->setRect(enemyRect);
-    
+
     // 更新敌人血量文字
     enemyHealthText->setPlainText(QString("Enemy: %1/%2").arg(enemyCurrentHealth).arg(enemyMaxHealth));
-    
+
     // 根据血量变化血条颜色
     if (characterHealthRatio > 0.6) {
         characterHealthBarFg->setBrush(QBrush(Qt::green));
@@ -586,7 +660,7 @@ void BattleScene::updateHealthBars() {
     } else {
         characterHealthBarFg->setBrush(QBrush(Qt::red));
     }
-    
+
     if (enemyHealthRatio > 0.6) {
         enemyHealthBarFg->setBrush(QBrush(Qt::green));
     } else if (enemyHealthRatio > 0.3) {
@@ -595,38 +669,53 @@ void BattleScene::updateHealthBars() {
         enemyHealthBarFg->setBrush(QBrush(Qt::red));
     }
 }
+void BattleScene::processCharacterPicking(Character* aCharacter) {
+    if (!aCharacter || !aCharacter->isPicking()) {
+        return;
+    }
 
-void BattleScene::processPicking() {
-    Scene::processPicking();
-    if (character && character->isPicking()) {
-        auto mountable = findNearestUnmountedMountable(character->pos(), 100.);
-        qDebug() << mountable;
-        if (mountable != nullptr) {
-            // 检查是否是盔甲
-            if (auto armor = dynamic_cast<Armor *>(mountable)) {
-                spareArmor = dynamic_cast<Armor *>(pickupMountable(character, mountable));
-            }
-            // 检查是否是武器
-            else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
-                // 拾取武器，如果角色之前有武器，旧武器会被放置在当前位置
-                Weapon* oldWeapon = dynamic_cast<Weapon *>(pickupMountable(character, mountable));
-                // if (oldWeapon) {
-                //     // 将旧武器放置在拾取位置
-                //     oldWeapon->setPos(dynamic_cast<QGraphicsItem*>(mountable)->pos());
-                //     qDebug() << "Dropped old weapon at position:" << dynamic_cast<QGraphicsItem*>(mountable)->pos();
-                // }
-            }
-            // 检查是否是消耗品
-            else if (auto consumable = dynamic_cast<Consumable *>(mountable)) {
-                // 使用消耗品
-                consumable->takeEffect(character);
-                // 从场景中移除消耗品
-                removeItem(dynamic_cast<QGraphicsItem*>(consumable));
-                delete consumable;
-                qDebug() << "Consumable used and removed from scene";
+    auto mountable = findNearestUnmountedMountable(aCharacter->pos(), 100.0);
+    if (mountable != nullptr) {
+        // 检查是否是盔甲
+        if (auto armor = dynamic_cast<Armor *>(mountable)) {
+            // pickupMountable 会返回旧盔甲，旧盔甲会自动 unmount 并留在原地。
+            // 我们不需要用任何变量来接住它。
+            pickupMountable(aCharacter, mountable);
+        }
+        // 检查是否是武器
+        else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
+            // 拾取武器，如果角色之前有武器，旧武器会被放置在当前位置
+            Weapon* oldWeapon = dynamic_cast<Weapon *>(pickupMountable(aCharacter, mountable));
+            if (oldWeapon) {
+                // 将旧武器放置在拾取新武器的位置
+                oldWeapon->setPos(dynamic_cast<QGraphicsItem*>(mountable)->pos());
+                oldWeapon->unmount(); // 确保它回到可拾取状态
+                qDebug() << "Dropped old weapon at position:" << oldWeapon->pos();
+
+
             }
         }
+        // 检查是否是消耗品
+        else if (auto consumable = dynamic_cast<Consumable *>(mountable)) {
+            // 使用消耗品
+            consumable->takeEffect(aCharacter);
+            // 从场景中移除消耗品
+            removeItem(dynamic_cast<QGraphicsItem*>(consumable));
+            delete consumable;
+            qDebug() << "Consumable used by a character and removed from scene";
+        }
     }
+}
+
+// 【改动】重构 processPicking 以调用新的辅助函数
+void BattleScene::processPicking() {
+    Scene::processPicking(); // 调用基类方法
+
+    // 为玩家1处理拾取
+    processCharacterPicking(character);
+
+    // 为玩家2处理拾取
+    processCharacterPicking(enemy);
 }
 
 Mountable *BattleScene::findNearestUnmountedMountable(const QPointF &pos, qreal distance_threshold) {

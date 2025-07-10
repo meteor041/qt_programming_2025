@@ -66,14 +66,19 @@ private:
     void initHealthBars();
     void updateHealthBars();
 
+    // 【新增】用于处理单个角色移动的辅助函数，避免代码重复
+    void processCharacterMovement(Character* aCharacter);
+    // 【新增】用于处理单个角色拾取的辅助函数
+    void processCharacterPicking(Character* aCharacter);
+
+
     Map *map;
     Character *character;
     Character *enemy;
-    Armor *spareArmor;
-    
-    // 新增：攻击按键状态
-    bool attackKeyDown{false};
-    
+
+     // 新增：玩家1和玩家2的攻击按键状态
+     bool attackKeyDown{false};      // 玩家1 (K键)
+     bool enemyAttackKeyDown{false}; // 玩家2 (0键)
     // 新增：武器掉落相关成员变量
     int weaponDropFrameCounter{0};  // 帧计数器
     static const int WEAPON_DROP_INTERVAL = 900;  // 900帧 = 10秒
