@@ -497,6 +497,15 @@ void BattleScene::processPicking() {
                 //     qDebug() << "Dropped old weapon at position:" << dynamic_cast<QGraphicsItem*>(mountable)->pos();
                 // }
             }
+            // 检查是否是消耗品
+            else if (auto consumable = dynamic_cast<Consumable *>(mountable)) {
+                // 使用消耗品
+                consumable->takeEffect(character);
+                // 从场景中移除消耗品
+                removeItem(dynamic_cast<QGraphicsItem*>(consumable));
+                delete consumable;
+                qDebug() << "Consumable used and removed from scene";
+            }
         }
     }
 }

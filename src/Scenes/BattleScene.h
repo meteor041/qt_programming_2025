@@ -12,6 +12,8 @@
 // 添加武器类的包含
 #include "../Items/Weapon/Fist.h"
 #include "../Items/Weapon/Knife.h"
+// 添加消耗品类的包含
+#include "../Items/Consumables/Consumable.h"
 
 class BattleScene : public Scene {
     Q_OBJECT
