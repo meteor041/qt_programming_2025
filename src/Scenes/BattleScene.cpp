@@ -62,6 +62,8 @@ void BattleScene::processPhysics() {
     const qreal GRAVITY = 0.8;
     const qreal MAX_FALL_SPEED = 20.0;
 
+    //定义误差量，由于图片更新大小导致
+    const qreal GROUND_TOLERANCE = 2.0;
     // --- 步骤 1: 应用重力 ---
     QPointF currentVelocity = character->getVelocity();
     currentVelocity.setY(currentVelocity.y() + GRAVITY);

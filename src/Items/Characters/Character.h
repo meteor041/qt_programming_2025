@@ -13,6 +13,14 @@
 #include <QPixmap>
 #include "../Item.h" // 确保包含了Item.h
 
+//人物状态，用于动画显示
+enum CharacterState {
+    Standing,
+    Running,
+    Jumping,
+    Crouching
+};
+
 class Character : public Item {
 public:
     explicit Character(QGraphicsItem *parent);
@@ -96,15 +104,20 @@ private:
     //角色是否处于下蹲的最终状态
     bool crouching{};
     
-    // 跳跃计时器相关变量
-    int jumpCooldownTimer{0};        // 跳跃冷却计时器
-    static const int JUMP_COOLDOWN_FRAMES = 30; // 跳跃冷却帧数（约0.33秒，假设90FPS）
-    QPixmap standingPixmap;//站立时的照片
-    QPixmap crouchingPixmap;//下蹲时的照片
-    qreal standingHeight;//站立照片高度
-    qreal crouchingHeight;//下蹲照片高度
+    // 【动画和状态管理变量】
+    CharacterState currentState{Standing};
+    int animationFrameIndex{0};
+    int animationFrameTimer{0};
+    static const int ANIMATION_FRAME_DURATION = 12; // 动画帧切换速度
 
+    // 【核心修改】为所有状态准备图片资源
+    QPixmap standingPixmap;                 // 站立时的图片
+    QPixmap crouchingPixmap;                // 下蹲时的图片
+    QList<QPixmap> runningAnimationFrames;  // 跑步动画序列
+    QList<QPixmap> jumpingAnimationFrames;  // 跳跃动画序列
 
+    qreal standingHeight;
+    qreal crouchingHeight;
 
     // 新增：生命值相关变量
     int health{100};           // 当前生命值

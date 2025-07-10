@@ -7,6 +7,16 @@
         <file>platform3.png</file>
         <file>Biker_basic.png</file>
         <file>Biker_crouch.png</file>
+        <file>Biker_jump1.png</file>
+        <file>Biker_jump2.png</file>
+        <file>Biker_jump3.png</file>
+        <file>Biker_jump4.png</file>
+        <file>Biker_run1.png</file>
+        <file>Biker_run2.png</file>
+        <file>Biker_run3.png</file>
+        <file>Biker_run4.png</file>
+        <file>Biker_run5.png</file>
+        <file>Biker_run6.png</file>
         <file>fist.png</file>
         <file>knife.png</file>
     </qresource>

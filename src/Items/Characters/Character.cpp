@@ -9,17 +9,47 @@
 
 // 【核心修改 B1】修改构造函数
 Character::Character(QGraphicsItem *parent)
-    // 1. 调用基类构造函数，给它一个默认的、将被隐藏的图片
     : Item(parent, ":/Biker_basic.png")
 {
-    // 2. 隐藏基类创建的图形
-    if (this->pixmapItem) { // this->pixmapItem 是从 Item 继承来的
+    // 隐藏基类创建的图形
+    if (this->pixmapItem) {
         this->pixmapItem->setVisible(false);
     }
 
-    // 3. 加载 Character 自己需要的图片资源
+    // --- 【核心修改：加载所有需要的图片资源】 ---
     standingPixmap.load(":/Biker_basic.png");
     crouchingPixmap.load(":/Biker_crouch.png");
+
+    // 2. 加载跑步动画（6帧）
+    for (int i = 1; i < 7; ++i) {
+        QString frameName = QString(":/Biker_run%1.png").arg(i);
+        QPixmap frame(frameName);
+        if (frame.isNull()) {
+            qDebug() << "警告: 跑步动画帧未找到:" << frameName;
+        } else {
+            runningAnimationFrames.append(frame);
+        }
+    }
+    if (runningAnimationFrames.isEmpty()) {
+        qDebug() << "错误: 没有跑步动画帧被加载。";
+        runningAnimationFrames.append(standingPixmap); // 备用
+    }
+
+    // 3. 加载跳跃动画（4帧）
+    for (int i = 1; i < 5; ++i) {
+        QString frameName = QString(":/Biker_jump%1.png").arg(i);
+        QPixmap frame(frameName);
+        if (frame.isNull()) {
+            qDebug() << "警告: 跳跃动画帧未找到:" << frameName;
+        } else {
+            jumpingAnimationFrames.append(frame);
+        }
+    }
+    if (jumpingAnimationFrames.isEmpty()) {
+        qDebug() << "错误: 没有跳跃动画帧被加载。";
+        jumpingAnimationFrames.append(standingPixmap); // 备用
+    }
+    // --- 【修改结束】 ---
 
     if (crouchingPixmap.isNull()) {
         qDebug() << "Warning: Crouching pixmap not found.";
@@ -121,56 +151,119 @@ void Character::processInput() {
     }
     lastPickDown = pickDown;
 
-    // 2. 更新角色状态和外观 (下蹲/站立)
+    // 更新角色状态和外观放到最后
     updateAppearanceAndState();
 
-    // 3. 如果正在下蹲，则禁止移动和跳跃，直接返回
-    if (isCrouching()) {
-        // 将水平速度清零
-        velocity.setX(0);
-        return; // 直接结束，不处理后续的移动和跳跃输入
-    }
 
-    // 4. (如果不下蹲) 处理水平移动
+    // 3. 【重大改动】根据【新】的状态来决定行为
     QPointF currentVelocity = getVelocity();
-    const auto moveSpeed = 5.0;
-    qreal targetHorizontalVelocity = 0;
-    if (isLeftDown()) {
-        targetHorizontalVelocity = -moveSpeed;
-        setTransformOriginPoint(boundingRect().center());
-        setTransform(QTransform().scale(-1, 1));
-    } else if (isRightDown()) {
-        targetHorizontalVelocity = moveSpeed;
-        setTransformOriginPoint(boundingRect().center());
-        setTransform(QTransform().scale(1, 1));
-    }
-    currentVelocity.setX(targetHorizontalVelocity);
 
-    // 5. (如果不下蹲) 处理跳跃
-    if (isJumpDown()) {
-        const auto jumpImpulse = -18.0;
-        currentVelocity.setY(jumpImpulse);
-        setJumpDown(false);
+    // 如果正在下蹲，则强制水平速度为0
+    if (currentState == Crouching) {
+        currentVelocity.setX(0);
+    } else {
+        // 只有在非下蹲状态下，才处理移动和跳跃
+        const auto moveSpeed = 5.0;
+        qreal targetHorizontalVelocity = 0;
+
+        if (isLeftDown()) {
+            targetHorizontalVelocity = -moveSpeed;
+            setTransformOriginPoint(boundingRect().center());
+            setTransform(QTransform().scale(-1, 1));
+        } else if (isRightDown()) {
+            targetHorizontalVelocity = moveSpeed;
+            setTransformOriginPoint(boundingRect().center());
+            setTransform(QTransform().scale(1, 1));
+        }
+        currentVelocity.setX(targetHorizontalVelocity);
+
+        if (isJumpDown()) {
+            const auto jumpImpulse = -18.0;
+            currentVelocity.setY(jumpImpulse);
+            setJumpDown(false); // 重置跳跃意图
+        }
     }
 
+    // 4. (保持不变) 设置最终速度
     setVelocity(currentVelocity);
 }
 
 void Character::updateAppearanceAndState() {
-    bool shouldCrouch = isCrouchDown() && !isPicking();
+    // 1. 决定当前帧应该是什么状态
+    CharacterState newState;
+    if (!isOnGround()) {
+        newState = Jumping;
+    } else if (isCrouchDown() && !isPicking()) {
+        newState = Crouching;
+    } else if (velocity.x() != 0) {
+        newState = Running;
+    } else {
+        newState = Standing;
+    }
 
-    if (shouldCrouch && !crouching) {
-        crouching = true;
-        // 操作我们自己的 characterPixmapItem
-        characterPixmapItem->setPixmap(crouchingPixmap);
-        setY(y() + (standingHeight - crouchingHeight));
-    } else if (!shouldCrouch && crouching) {
-        crouching = false;
-        // 操作我们自己的 characterPixmapItem
-        characterPixmapItem->setPixmap(standingPixmap);
-        setY(y() - (standingHeight - crouchingHeight));
+    // 2. 如果状态发生了变化，进行初始化处理
+    if (newState != currentState) {
+        // 处理从下蹲 -> 非下蹲的高度变化
+        if (currentState == Crouching && newState != Crouching) {
+            setY(y() - (standingHeight - crouchingHeight));
+        }
+
+        currentState = newState;
+        animationFrameIndex = 0;
+        animationFrameTimer = 0;
+
+        // 【动画修复】在状态切换的瞬间，立即设置动画的第0帧
+        switch (currentState) {
+        case Standing:
+            characterPixmapItem->setPixmap(standingPixmap);
+            break;
+        case Crouching:
+            // 处理从非下蹲 -> 下蹲的高度变化
+            setY(y() + (standingHeight - crouchingHeight));
+            characterPixmapItem->setPixmap(crouchingPixmap);
+            break;
+        case Running:
+            if (!runningAnimationFrames.isEmpty()) {
+                characterPixmapItem->setPixmap(runningAnimationFrames[0]);
+            }
+            break;
+        case Jumping:
+            if (!jumpingAnimationFrames.isEmpty()) {
+                characterPixmapItem->setPixmap(jumpingAnimationFrames[0]);
+            }
+            break;
+        }
+    }
+
+    // 3. 根据当前状态，【每帧】更新动画
+    animationFrameTimer++;
+
+    // 重置crouching标志位，它只在Crouching状态下为true
+    crouching = (currentState == Crouching);
+
+    // 【动画修复】只在需要动画的状态下，才处理帧更新逻辑
+    switch (currentState) {
+    case Running:
+        if (animationFrameTimer >= ANIMATION_FRAME_DURATION && !runningAnimationFrames.isEmpty()) {
+            animationFrameTimer = 0;
+            animationFrameIndex = (animationFrameIndex + 1) % runningAnimationFrames.size();
+            characterPixmapItem->setPixmap(runningAnimationFrames[animationFrameIndex]);
+        }
+        break;
+    case Jumping:
+        if (animationFrameTimer >= ANIMATION_FRAME_DURATION && !jumpingAnimationFrames.isEmpty()) {
+            animationFrameTimer = 0;
+            animationFrameIndex = (animationFrameIndex + 1) % jumpingAnimationFrames.size();
+            characterPixmapItem->setPixmap(jumpingAnimationFrames[animationFrameIndex]);
+        }
+        break;
+    // Standing 和 Crouching 不需要每帧更新动画
+    case Standing:
+    case Crouching:
+        break;
     }
 }
+
 
 bool Character::isPicking() const {
     return picking;
