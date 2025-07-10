@@ -5,6 +5,8 @@
 
 #include <QKeyEvent>
 #include <QRandomGenerator>
+#include <QGraphicsRectItem>
+#include <QGraphicsTextItem>
 #include "Scene.h"
 #include "../Items/Maps/Map.h"
 #include "../Items/Characters/Character.h"
@@ -59,6 +61,10 @@ private:
     // 新增：消耗品掉落相关辅助函数
     Consumable* createRandomConsumable();
     void updateFallingConsumables();
+    
+    // 新增：血条UI相关函数
+    void initHealthBars();
+    void updateHealthBars();
 
     // 【新增】用于处理单个角色移动的辅助函数，避免代码重复
     void processCharacterMovement(Character* aCharacter);
@@ -84,6 +90,17 @@ private:
     static const int CONSUMABLE_DROP_INTERVAL = 900;  // 900帧 = 15秒
     QList<Consumable*> fallingConsumables;  // 正在下落的消耗品列表
     static constexpr qreal CONSUMABLE_FALL_SPEED = 10.0;  // 消耗品下落速度
+    
+    // 新增：血条UI相关成员变量
+    QGraphicsRectItem* characterHealthBarBg;  // 角色血条背景
+    QGraphicsRectItem* characterHealthBarFg;  // 角色血条前景
+    QGraphicsTextItem* characterHealthText;   // 角色血量文字
+    QGraphicsRectItem* enemyHealthBarBg;      // 敌人血条背景
+    QGraphicsRectItem* enemyHealthBarFg;      // 敌人血条前景
+    QGraphicsTextItem* enemyHealthText;       // 敌人血量文字
+    
+    static constexpr qreal HEALTH_BAR_WIDTH = 200.0;   // 血条宽度
+    static constexpr qreal HEALTH_BAR_HEIGHT = 20.0;   // 血条高度
 };
 
 #endif //QT_PROGRAMMING_2024_BATTLESCENE_H
