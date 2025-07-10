@@ -1,0 +1,25 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- 注射器主体 -->
+  <rect x="8" y="12" width="16" height="6" rx="1" fill="#e6e6e6" stroke="#333333" stroke-width="1"/>
+  
+  <!-- 注射器针头 -->
+  <rect x="24" y="14" width="4" height="2" fill="#c0c0c0" stroke="#333333" stroke-width="0.5"/>
+  
+  <!-- 注射器柱塞 -->
+  <rect x="4" y="13" width="4" height="4" rx="1" fill="#666666" stroke="#333333" stroke-width="1"/>
+  
+  <!-- 药液 -->
+  <rect x="10" y="13.5" width="12" height="3" fill="#00ff00" opacity="0.8"/>
+  
+  <!-- 刻度线 -->
+  <line x1="12" y1="12" x2="12" y2="18" stroke="#999999" stroke-width="0.5"/>
+  <line x1="16" y1="12" x2="16" y2="18" stroke="#999999" stroke-width="0.5"/>
+  <line x1="20" y1="12" x2="20" y2="18" stroke="#999999" stroke-width="0.5"/>
+  
+  <!-- 能量效果光环 -->
+  <circle cx="16" cy="15" r="12" fill="none" stroke="#00ff00" stroke-width="1" opacity="0.3"/>
+  <circle cx="16" cy="15" r="14" fill="none" stroke="#00ff00" stroke-width="0.5" opacity="0.2"/>
+  
+  <!-- 针头尖端 -->
+  <polygon points="28,15 30,15 29,14 29,16" fill="#999999"/>
+</svg>

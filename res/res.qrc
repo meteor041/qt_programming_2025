@@ -19,5 +19,8 @@
         <file>Biker_run6.png</file>
         <file>fist.png</file>
         <file>knife.png</file>
+        <file>bandage.svg</file>
+        <file>medkit.svg</file>
+        <file>adrenaline.svg</file>
     </qresource>
 </RCC>

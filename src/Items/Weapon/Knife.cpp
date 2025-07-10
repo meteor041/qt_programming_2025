@@ -7,8 +7,12 @@
 Knife::Knife(QGraphicsItem *parent) 
     : Weapon(parent, "15") {
     // 设置刀的图片
+    if (!pixmapItem) {
+        pixmapItem = new QGraphicsPixmapItem(this);
+    }
     if (pixmapItem) {
         pixmapItem->setPixmap(QPixmap(":/knife.png"));
+        pixmapItem->setPos(30, -10);
     }
     // 刀需要手动装备
 }

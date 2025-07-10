@@ -1,0 +1,21 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- 医疗包主体 -->
+  <rect x="6" y="10" width="20" height="16" rx="2" fill="#ffffff" stroke="#333333" stroke-width="2"/>
+  
+  <!-- 医疗包顶部 -->
+  <rect x="8" y="8" width="16" height="4" rx="1" fill="#cccccc" stroke="#333333" stroke-width="1"/>
+  
+  <!-- 手柄 -->
+  <rect x="13" y="6" width="6" height="2" rx="1" fill="#666666"/>
+  
+  <!-- 红十字标志 -->
+  <rect x="14" y="14" width="4" height="10" fill="#dc143c"/>
+  <rect x="11" y="17" width="10" height="4" fill="#dc143c"/>
+  
+  <!-- 医疗包锁扣 -->
+  <rect x="15" y="9" width="2" height="1" fill="#666666"/>
+  
+  <!-- 侧面细节 -->
+  <line x1="6" y1="14" x2="26" y2="14" stroke="#dddddd" stroke-width="0.5"/>
+  <line x1="6" y1="22" x2="26" y2="22" stroke="#dddddd" stroke-width="0.5"/>
+</svg>

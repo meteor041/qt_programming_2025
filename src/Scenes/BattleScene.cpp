@@ -34,21 +34,21 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     enemy->setZValue(10);
     // 将玩家2放置在场景右侧，与玩家1对称
     enemy->setPos(sceneRect().width() - spawnPos.x() - enemy->boundingRect().width(), spawnPos.y());
-    // 创建备用盔甲
-    spareArmor = new FlamebreakerArmor();
-    addItem(spareArmor);
-    spareArmor->unmount();
+    // 【改动】使用局部变量创建初始盔甲，不再使用成员变量 spareArmor
+    Armor* initialArmor = new FlamebreakerArmor();
+    addItem(initialArmor);
+    initialArmor->unmount();
 
     // 将盔甲放置在场景中央的平台上
     QPointF armorTargetPos(sceneRect().center().x() + 200, 0); // 设定一个目标水平位置
-    Platform* groundForArmor = map->getGroundPlatform(armorTargetPos, spareArmor->boundingRect().height());
+    Platform* groundForArmor = map->getGroundPlatform(armorTargetPos, initialArmor->boundingRect().height());
     if (groundForArmor) {
         // 如果找到了平台，将盔甲放在平台表面上方
-        spareArmor->setPos(armorTargetPos.x(),
-                           groundForArmor->getSurfaceY() - spareArmor->boundingRect().height());
+        initialArmor->setPos(armorTargetPos.x(),
+                             groundForArmor->getSurfaceY() - initialArmor->boundingRect().height());
     } else {
         // 如果没找到平台（作为备用方案），放在一个安全的位置
-        spareArmor->setPos(sceneRect().center());
+        initialArmor->setPos(sceneRect().center());
     }
 }
 
@@ -440,21 +440,164 @@ bool BattleScene::isInAttackRange(Character* attacker, Character* target, qreal 
 }
 
 
+// 在现有的update()方法中添加武器掉落处理
 void BattleScene::update() {
     // 添加战斗处理
     processCombat();
+    // 添加武器掉落处理
+    processWeaponDrop();
+    // 添加消耗品掉落处理
+    processConsumableDrop();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
     Scene::update();
 }
 
-void BattleScene::processPicking() {
-    Scene::processPicking();
-    if (character && character->isPicking()) {
-        auto mountable = findNearestUnmountedMountable(character->pos(), 100.);
-        if (mountable != nullptr) {
-            spareArmor = dynamic_cast<Armor *>(pickupMountable(character, mountable));
+// 新增：武器掉落处理函数
+void BattleScene::processWeaponDrop() {
+    // 增加帧计数器
+    weaponDropFrameCounter++;
+    
+    // 检查是否到了掉落武器的时间（每900帧）
+    if (weaponDropFrameCounter >= WEAPON_DROP_INTERVAL) {
+        // 重置计数器
+        weaponDropFrameCounter = 0;
+        
+        // 创建随机武器
+        Weapon* newWeapon = createRandomWeapon();
+        if (newWeapon) {
+            // 设置武器的随机X位置（屏幕顶部）
+            qreal randomX = QRandomGenerator::global()->bounded(static_cast<int>(50), static_cast<int>(sceneRect().width() - 50));
+            newWeapon->setPos(randomX, 0);  // Y轴为0（屏幕顶部）
+            
+            // 添加到场景中
+            addItem(newWeapon);
+            
+            // 添加到下落武器列表中
+            fallingWeapons.append(newWeapon);
+            
+            qDebug() << "Weapon dropped at position:" << randomX << ", 0";
         }
     }
+    
+    // 更新所有正在下落的武器
+    updateFallingWeapons();
+}
+
+// 新增：创建随机武器
+Weapon* BattleScene::createRandomWeapon() {
+    // 随机选择武器类型（不包括Weapon基类）
+    int weaponType = QRandomGenerator::global()->bounded(2);  // 0-1，对应Fist和Knife
+    
+    Weapon* weapon = nullptr;
+    switch (weaponType) {
+        case 0:
+            weapon = new Fist();
+            qDebug() << "Created Fist weapon";
+            break;
+        case 1:
+            weapon = new Knife();
+            qDebug() << "Created Knife weapon";
+            break;
+        default:
+            weapon = new Fist();  // 默认创建拳头
+            break;
+    }
+    
+    return weapon;
+}
+
+// 新增：更新正在下落的武器
+void BattleScene::updateFallingWeapons() {
+    // 使用迭代器遍历，以便安全地删除元素
+    auto it = fallingWeapons.begin();
+    while (it != fallingWeapons.end()) {
+        Weapon* weapon = *it;
+        
+        // 更新武器位置（向下移动）
+        QPointF currentPos = weapon->pos();
+        QPointF newPos = currentPos + QPointF(0, WEAPON_FALL_SPEED);
+        
+        // 检查武器是否落到地面上
+        bool hasLanded = false;
+        if (map) {
+            Platform* groundPlatform = map->getGroundPlatform(newPos, weapon->boundingRect().height());
+            if (groundPlatform) {
+                qreal surfaceY = groundPlatform->getSurfaceY();
+                qreal weaponBottom = newPos.y() + weapon->boundingRect().height();
+                
+                // 如果武器底部接触或穿过平台表面
+                if (weaponBottom >= surfaceY) {
+                    // 将武器放置在平台表面上
+                    newPos.setY(surfaceY - weapon->boundingRect().height());
+                    hasLanded = true;
+                }
+            }
+        }
+        
+        // 检查武器是否落到场景底部
+        if (newPos.y() + weapon->boundingRect().height() >= sceneRect().height() - 120) {
+            newPos.setY(sceneRect().height() - 120 - weapon->boundingRect().height());
+            hasLanded = true;
+        }
+        
+        // 更新武器位置
+        weapon->setPos(newPos);
+        
+        // 如果武器已经着陆，从下落列表中移除
+        if (hasLanded) {
+            qDebug() << "Weapon landed at position:" << newPos;
+            it = fallingWeapons.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void BattleScene::processCharacterPicking(Character* aCharacter) {
+    if (!aCharacter || !aCharacter->isPicking()) {
+        return;
+    }
+
+    auto mountable = findNearestUnmountedMountable(aCharacter->pos(), 100.0);
+    if (mountable != nullptr) {
+        // 检查是否是盔甲
+        if (auto armor = dynamic_cast<Armor *>(mountable)) {
+            // pickupMountable 会返回旧盔甲，旧盔甲会自动 unmount 并留在原地。
+            // 我们不需要用任何变量来接住它。
+            pickupMountable(aCharacter, mountable);
+        }
+        // 检查是否是武器
+        else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
+            // 拾取武器，如果角色之前有武器，旧武器会被放置在当前位置
+            Weapon* oldWeapon = dynamic_cast<Weapon *>(pickupMountable(aCharacter, mountable));
+            if (oldWeapon) {
+                // 将旧武器放置在拾取新武器的位置
+                oldWeapon->setPos(dynamic_cast<QGraphicsItem*>(mountable)->pos());
+                oldWeapon->unmount(); // 确保它回到可拾取状态
+                qDebug() << "Dropped old weapon at position:" << oldWeapon->pos();
+            }
+        }
+        // 检查是否是消耗品
+        else if (auto consumable = dynamic_cast<Consumable *>(mountable)) {
+            // 使用消耗品
+            consumable->takeEffect(aCharacter);
+            // 从场景中移除消耗品
+            removeItem(dynamic_cast<QGraphicsItem*>(consumable));
+            delete consumable;
+            qDebug() << "Consumable used by a character and removed from scene";
+        }
+    }
+}
+
+// 【改动】重构 processPicking 以调用新的辅助函数
+void BattleScene::processPicking() {
+    Scene::processPicking(); // 调用基类方法
+
+    // 为玩家1处理拾取
+    processCharacterPicking(character);
+
+    // 为玩家2处理拾取
+    processCharacterPicking(enemy);
 }
 
 Mountable *BattleScene::findNearestUnmountedMountable(const QPointF &pos, qreal distance_threshold) {
@@ -478,5 +621,120 @@ Mountable *BattleScene::pickupMountable(Character *character, Mountable *mountab
     if (auto armor = dynamic_cast<Armor *>(mountable)) {
         return character->pickupArmor(armor);
     }
+    // 新增：处理武器拾取
+    else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
+        // 获取角色当前装备的武器
+        Weapon* oldWeapon = character->getWeapon();
+        // 装备新武器
+        character->setWeapon(weapon);
+        qDebug() << "Character equipped weapon with attack power:" << weapon->getAttackPower();
+        // 返回之前装备的武器（如果有的话）
+        return oldWeapon;
+    }
     return nullptr;
+}
+
+// 新增：消耗品掉落处理函数
+void BattleScene::processConsumableDrop() {
+    // 增加帧计数器
+    consumableDropFrameCounter++;
+    
+    // 检查是否到了掉落消耗品的时间（每900帧）
+    if (consumableDropFrameCounter >= CONSUMABLE_DROP_INTERVAL) {
+        // 重置计数器
+        consumableDropFrameCounter = 0;
+        
+        // 创建随机消耗品
+        Consumable* newConsumable = createRandomConsumable();
+        if (newConsumable) {
+            // 设置消耗品的随机X位置（屏幕顶部）
+            qreal randomX = QRandomGenerator::global()->bounded(static_cast<int>(50), static_cast<int>(sceneRect().width() - 50));
+            newConsumable->setPos(randomX, 0);  // Y轴为0（屏幕顶部）
+            
+            // 添加到场景中
+            addItem(newConsumable);
+            
+            // 添加到下落消耗品列表中
+            fallingConsumables.append(newConsumable);
+            
+            qDebug() << "Consumable dropped at position:" << randomX << ", 0";
+        }
+    }
+    
+    // 更新所有正在下落的消耗品
+    updateFallingConsumables();
+}
+
+// 新增：创建随机消耗品
+Consumable* BattleScene::createRandomConsumable() {
+    // 随机选择消耗品类型（0-2，对应Bandage、Medkit和Adrenaline）
+    int consumableType = QRandomGenerator::global()->bounded(3);
+    
+    Consumable* consumable = nullptr;
+    switch (consumableType) {
+        case 0:
+            consumable = new Bandage();
+            qDebug() << "Created Bandage consumable";
+            break;
+        case 1:
+            consumable = new Medkit();
+            qDebug() << "Created Medkit consumable";
+            break;
+        case 2:
+            consumable = new Adrenaline();
+            qDebug() << "Created Adrenaline consumable";
+            break;
+        default:
+            consumable = new Bandage();  // 默认创建绷带
+            break;
+    }
+    
+    return consumable;
+}
+
+// 新增：更新正在下落的消耗品
+void BattleScene::updateFallingConsumables() {
+    // 使用迭代器遍历，以便安全地删除元素
+    auto it = fallingConsumables.begin();
+    while (it != fallingConsumables.end()) {
+        Consumable* consumable = *it;
+        
+        // 更新消耗品位置（向下移动）
+        QPointF currentPos = consumable->pos();
+        QPointF newPos = currentPos + QPointF(0, CONSUMABLE_FALL_SPEED);
+        
+        // 检查消耗品是否落到地面上
+        bool hasLanded = false;
+        if (map) {
+            Platform* groundPlatform = map->getGroundPlatform(newPos, consumable->boundingRect().height());
+            if (groundPlatform) {
+                qreal surfaceY = groundPlatform->getSurfaceY();
+                qreal consumableBottom = newPos.y() + consumable->boundingRect().height();
+                
+                // 如果消耗品底部接触或穿过平台表面
+                if (consumableBottom >= surfaceY) {
+                    // 将消耗品放置在平台表面上
+                    newPos.setY(surfaceY - consumable->boundingRect().height());
+                    hasLanded = true;
+                }
+            }
+        }
+        
+        // 检查消耗品是否落到场景底部
+        if (newPos.y() + consumable->boundingRect().height() >= sceneRect().height() - 120) {
+            newPos.setY(sceneRect().height() - 120 - consumable->boundingRect().height());
+            hasLanded = true;
+        }
+        
+        // 更新消耗品位置
+        consumable->setPos(newPos);
+        
+        // 如果消耗品已经着陆，从下落列表中移除
+        if (hasLanded) {
+            qDebug() << "Consumable landed at position:" << newPos;
+            it = fallingConsumables.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }

@@ -70,6 +70,13 @@ Character::Character(QGraphicsItem *parent)
     ellipseItem->setZValue(1);
     // 初始化默认武器：拳头
     weapon = new Fist(this);
+    
+    // 初始化肾上腺素效果相关变量
+    adrenalineActive = false;
+    adrenalineTimer = 0;
+    adrenalineSpeedMultiplier = 1.0;
+    adrenalineHealPerFrame = 0;
+    adrenalineHealCounter = 0;
 }
 
 QRectF Character::boundingRect() const {
@@ -165,6 +172,9 @@ void Character::setCurrentPlatform(Platform* platform) {
 
 
 void Character::processInput() {
+    // 0. 更新肾上腺素效果
+    updateAdrenalineEffect();
+    
     // 1. 处理拾取状态 (这必须在最前面，以决定本帧是否在执行拾取动作)
     if (!lastPickDown && pickDown) {
         picking = true;
@@ -189,11 +199,15 @@ void Character::processInput() {
         qreal targetHorizontalVelocity = 0;
 
         if (isLeftDown()) {
-            targetHorizontalVelocity = -moveSpeed * m_speedMultiplier;
+            // 应用平台速度倍率和肾上腺素速度倍率
+            qreal totalSpeedMultiplier = m_speedMultiplier * (adrenalineActive ? adrenalineSpeedMultiplier : 1.0);
+            targetHorizontalVelocity = -moveSpeed * totalSpeedMultiplier;
             setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(-1, 1));
         } else if (isRightDown()) {
-            targetHorizontalVelocity = moveSpeed * m_speedMultiplier;
+            // 应用平台速度倍率和肾上腺素速度倍率
+            qreal totalSpeedMultiplier = m_speedMultiplier * (adrenalineActive ? adrenalineSpeedMultiplier : 1.0);
+            targetHorizontalVelocity = moveSpeed * totalSpeedMultiplier;
             setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(1, 1));
         }
@@ -319,18 +333,23 @@ Weapon* Character::getWeapon() const {
 }
 
 void Character::setWeapon(Weapon* newWeapon) {
+    QPointF oldWeaponPos;
     if (weapon != nullptr && weapon != newWeapon) {
         // 卸载当前武器
+        oldWeaponPos = weapon->pos();
+        weapon->setPos(newWeapon->pos());
         weapon->unmount();
         weapon->setParentItem(parentItem());
     }
     
     if (newWeapon != nullptr) {
         // 装备新武器
+        if (weapon != nullptr) {
+            newWeapon->setPos(oldWeaponPos);
+        }
         newWeapon->setParentItem(this);
         newWeapon->mountToParent();
     }
-    
     weapon = newWeapon;
 }
 
@@ -397,5 +416,39 @@ void Character::heal(int amount) {
     
     health = qMin(health + amount, maxHealth);
     qDebug() << "Character healed" << amount << "health, current health:" << health;
+}
+
+// 肾上腺素效果系统实现
+void Character::startAdrenalineEffect(int duration, qreal speedMultiplier, int healPerFrame) {
+    adrenalineActive = true;
+    adrenalineTimer = duration;
+    adrenalineSpeedMultiplier = speedMultiplier;
+    adrenalineHealPerFrame = healPerFrame;
+    adrenalineHealCounter = 0;
+    
+    qDebug() << "Adrenaline effect started: duration =" << duration 
+             << ", speed multiplier =" << speedMultiplier 
+             << ", heal per frame =" << healPerFrame;
+}
+
+void Character::updateAdrenalineEffect() {
+    if (!adrenalineActive) return;
+    
+    // 减少剩余时间
+    adrenalineTimer--;
+    
+    // 处理持续回血（每60帧回血一次）
+    adrenalineHealCounter++;
+    if (adrenalineHealCounter >= 60) {
+        heal(adrenalineHealPerFrame);
+        adrenalineHealCounter = 0;
+    }
+    
+    // 检查效果是否结束
+    if (adrenalineTimer <= 0) {
+        adrenalineActive = false;
+        adrenalineSpeedMultiplier = 1.0;
+        qDebug() << "Adrenaline effect ended";
+    }
 }
 

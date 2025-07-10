@@ -92,6 +92,10 @@ public:
     void setHealth(int health);
     void takeDamage(int damage);
     void heal(int amount);
+    
+    // 新增：肾上腺素效果系统
+    void startAdrenalineEffect(int duration, qreal speedMultiplier, int healPerFrame);
+    void updateAdrenalineEffect(); // 在每帧更新中调用
 
 protected:
     HeadEquipment *headEquipment{};
@@ -139,6 +143,13 @@ private:
     int health{100};           // 当前生命值
     int maxHealth{100};        // 最大生命值
     bool dead{false};          // 是否死亡
+    
+    // 新增：肾上腺素效果相关变量
+    bool adrenalineActive{false};     // 肾上腺素是否激活
+    int adrenalineTimer{0};           // 肾上腺素剩余时间
+    qreal adrenalineSpeedMultiplier{1.0}; // 肾上腺素速度倍率
+    int adrenalineHealPerFrame{0};    // 每帧回血量
+    int adrenalineHealCounter{0};     // 回血计数器
 };
 
 
