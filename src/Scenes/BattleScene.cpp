@@ -5,7 +5,7 @@
 #include "BattleScene.h"
 #include "../Items/Characters/Link.h" // 假设你的角色是Link
 #include "../Items/Maps/Battlefield.h"
-#include "../Items/Armors/FlamebreakerArmor.h"
+#include "../Items/Armors/ChainmailArmor.h"
 #include "../Items/Maps/platform/Platform.h" // 包含平台基类
 
 // 构造函数：初始化整个战斗场景
@@ -35,7 +35,7 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     // 将玩家2放置在场景右侧，与玩家1对称
     enemy->setPos(sceneRect().width() - spawnPos.x() - enemy->boundingRect().width(), spawnPos.y());
     // 【改动】使用局部变量创建初始盔甲，不再使用成员变量 spareArmor
-    Armor* initialArmor = new FlamebreakerArmor();
+    Armor* initialArmor = new ChainmailArmor(); // 或者 new BulletproofVest();
     addItem(initialArmor);
     initialArmor->unmount();
 
@@ -53,6 +53,8 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     
     // 初始化血条UI
     initHealthBars();
+    //初始化护甲UI
+    initArmorDisplays();
 
     // 【新增】初始化FPS显示
     fpsTextItem = new QGraphicsTextItem();
@@ -426,7 +428,7 @@ void BattleScene::processCharacterCombat(Character* attacker, Character* target,
 
         // 从武器获取伤害值
         int damage = attacker->getWeapon()->getAttackPower();
-        target->takeDamage(damage);
+        target->takeDamage(damage, attacker->getWeapon());
 
        qDebug() << "Character attacked Character"
                 << "for" << damage << "damage! Target health:" << target->getHealth();
@@ -475,6 +477,82 @@ bool BattleScene::isInAttackRange(Character* attacker, Character* target, qreal 
     return targetIsOnRight == attackerFacingRight;
 }
 
+// 【新增】护甲掉落处理函数
+void BattleScene::processArmorDrop() {
+    armorDropFrameCounter++;
+
+    if (armorDropFrameCounter >= ARMOR_DROP_INTERVAL) {
+        armorDropFrameCounter = 0;
+
+        Armor* newArmor = createRandomArmor();
+        if (newArmor) {
+            qreal randomX = QRandomGenerator::global()->bounded(static_cast<int>(50), static_cast<int>(sceneRect().width() - 50));
+            newArmor->setPos(randomX, 0);
+            addItem(newArmor);
+            fallingArmors.append(newArmor);
+            qDebug() << "Armor dropped at position:" << newArmor->pos();
+        }
+    }
+
+    updateFallingArmors();
+}
+
+// 【新增】创建随机护甲
+Armor* BattleScene::createRandomArmor() {
+    int armorType = QRandomGenerator::global()->bounded(2); // 0 或 1
+
+    Armor* armor = nullptr;
+    switch (armorType) {
+    case 0:
+        armor = new ChainmailArmor();
+        qDebug() << "Created Chainmail Armor";
+        break;
+    case 1:
+        armor = new BulletproofVest();
+        qDebug() << "Created Bulletproof Vest";
+        break;
+    default:
+        armor = new ChainmailArmor();
+        break;
+    }
+
+    return armor;
+}
+
+// 【新增】更新下落中的护甲
+void BattleScene::updateFallingArmors() {
+    auto it = fallingArmors.begin();
+    while (it != fallingArmors.end()) {
+        Armor* armor = *it;
+        QPointF newPos = armor->pos() + QPointF(0, ARMOR_FALL_SPEED);
+
+        bool hasLanded = false;
+        if (map) {
+            Platform* groundPlatform = map->getGroundPlatform(newPos, armor->boundingRect().height());
+            if (groundPlatform) {
+                qreal surfaceY = groundPlatform->getSurfaceY();
+                if (newPos.y() + armor->boundingRect().height() >= surfaceY) {
+                    newPos.setY(surfaceY - armor->boundingRect().height());
+                    hasLanded = true;
+                }
+            }
+        }
+
+        if (newPos.y() + armor->boundingRect().height() >= sceneRect().height() - 120) {
+            newPos.setY(sceneRect().height() - 120 - armor->boundingRect().height());
+            hasLanded = true;
+        }
+
+        armor->setPos(newPos);
+
+        if (hasLanded) {
+            it = fallingArmors.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
 
 void BattleScene::update() {
     // 【新增】FPS计算和显示逻辑
@@ -497,6 +575,10 @@ void BattleScene::update() {
     processWeaponDrop();
     // 添加消耗品掉落处理
     processConsumableDrop();
+    // 【新增】添加护甲掉落处理
+    processArmorDrop();
+    // 【新增】更新护甲UI
+    updateArmorDisplays();
     // 更新血条UI
     updateHealthBars();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
@@ -708,42 +790,121 @@ void BattleScene::updateHealthBars() {
         enemyHealthBarFg->setBrush(QBrush(Qt::red));
     }
 }
+
+// 【新增】初始化护甲UI
+void BattleScene::initArmorDisplays() {
+    // 角色护甲文本 (左侧，血条下方)
+    characterArmorText = new QGraphicsTextItem();
+    // 定位在血量文字下方，留出一些间距
+    characterArmorText->setPos(20, 20 + HEALTH_BAR_HEIGHT + 25);
+    characterArmorText->setDefaultTextColor(Qt::cyan); // 使用与血量不同的颜色以区分
+    characterArmorText->setFont(QFont("Arial", 12, QFont::Bold));
+    characterArmorText->setZValue(102); // 与血量文字同层级
+    addItem(characterArmorText);
+
+    // 敌人护甲文本 (右侧，血条下方)
+    enemyArmorText = new QGraphicsTextItem();
+    // 定位在血量文字下方
+    enemyArmorText->setPos(sceneRect().width() - HEALTH_BAR_WIDTH - 20, 20 + HEALTH_BAR_HEIGHT + 25);
+    enemyArmorText->setDefaultTextColor(Qt::cyan);
+    enemyArmorText->setFont(QFont("Arial", 12, QFont::Bold));
+    enemyArmorText->setZValue(102);
+    addItem(enemyArmorText);
+}
+
+// 【新增】更新护甲UI
+void BattleScene::updateArmorDisplays() {
+    if (!character || !enemy) {
+        return;
+    }
+
+    // --- 更新角色护甲信息 ---
+    Armor* characterArmor = character->getArmor(); // 使用我们之前添加的 getArmor()
+    if (characterArmor) {
+        // 如果有护甲，显示名称和耐久度
+        QString armorInfo = QString("Armor: %1 (%2/%3)")
+                                .arg(characterArmor->getName()) // 调用 getName()
+                                .arg(characterArmor->getDurability())
+                                .arg(characterArmor->getMaxDurability());
+        characterArmorText->setPlainText(armorInfo);
+    } else {
+        // 如果没有护甲，显示 "None"
+        characterArmorText->setPlainText("Armor: None");
+    }
+
+    // --- 更新敌人护甲信息 (逻辑完全相同) ---
+    Armor* enemyArmor = enemy->getArmor();
+    if (enemyArmor) {
+        QString armorInfo = QString("Armor: %1 (%2/%3)")
+        .arg(enemyArmor->getName())
+            .arg(enemyArmor->getDurability())
+            .arg(enemyArmor->getMaxDurability());
+        enemyArmorText->setPlainText(armorInfo);
+    } else {
+        enemyArmorText->setPlainText("Armor: None");
+    }
+}
+
 void BattleScene::processCharacterPicking(Character* aCharacter) {
     if (!aCharacter || !aCharacter->isPicking()) {
         return;
     }
 
-    auto mountable = findNearestUnmountedMountable(aCharacter->pos(), 100.0);
-    if (mountable != nullptr) {
-        // 检查是否是盔甲
-        if (auto armor = dynamic_cast<Armor *>(mountable)) {
-            // pickupMountable 会返回旧盔甲，旧盔甲会自动 unmount 并留在原地。
-            // 我们不需要用任何变量来接住它。
-            pickupMountable(aCharacter, mountable);
-        }
-        // 检查是否是武器
-        else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
-            // 拾取武器，如果角色之前有武器，旧武器会被放置在当前位置
-            Weapon* oldWeapon = dynamic_cast<Weapon *>(pickupMountable(aCharacter, mountable));
-            if (oldWeapon) {
-                // 将旧武器放置在拾取新武器的位置
-                oldWeapon->setPos(dynamic_cast<QGraphicsItem*>(mountable)->pos());
-                oldWeapon->unmount(); // 确保它回到可拾取状态
-                qDebug() << "Dropped old weapon at position:" << oldWeapon->pos();
+    // 1. 寻找最近的可拾取物品
+    Mountable* mountableToPick = findNearestUnmountedMountable(aCharacter->pos(), 100.0);
+    if (mountableToPick == nullptr) {
+        return;
+    }
+
+    // 2. 根据物品类型，执行不同的拾取逻辑
+    // 【重要】将 mountableToPick 转换为 QGraphicsItem* 以便后续操作
+    auto itemToPick = dynamic_cast<QGraphicsItem*>(mountableToPick);
+    if (itemToPick == nullptr) {
+        return; // 如果一个 Mountable 不能被转换为 QGraphicsItem，我们无法处理它
+    }
 
 
+    // 情况一：拾取的是消耗品 (Consumable)
+    if (auto consumable = dynamic_cast<Consumable *>(mountableToPick)) {
+        qDebug() << "Picking up a consumable.";
+        // 消耗品：使用效果，然后从场景中移除并删除
+        consumable->takeEffect(aCharacter);
+        removeItem(itemToPick);
+        delete itemToPick; // 直接删除 QGraphicsItem* 即可
+    }
+    // 情况二：拾取的是护甲 (Armor)
+    else if (auto armor = dynamic_cast<Armor *>(mountableToPick)) {
+        qDebug() << "Picking up an armor.";
+        // 护甲：调用 pickupMountable，它会处理装备并返回旧护甲
+        Mountable* oldMountable = pickupMountable(aCharacter, mountableToPick);
+
+        // 如果有旧护甲被替换下来
+        if (oldMountable) {
+            if (auto oldItem = dynamic_cast<QGraphicsItem*>(oldMountable)) {
+                // 将旧护甲丢在当前新护甲的位置
+                oldItem->setPos(itemToPick->pos());
+                oldMountable->unmount(); // 确保其可被再次拾取
+                qDebug() << "Dropped old armor at" << oldItem->pos();
             }
         }
-        // 检查是否是消耗品
-        else if (auto consumable = dynamic_cast<Consumable *>(mountable)) {
-            // 使用消耗品
-            consumable->takeEffect(aCharacter);
-            // 从场景中移除消耗品
-            removeItem(dynamic_cast<QGraphicsItem*>(consumable));
-            delete consumable;
-            qDebug() << "Consumable used by a character and removed from scene";
+    }
+    // 情况三：拾取的是武器 (Weapon)
+    else if (auto weapon = dynamic_cast<Weapon *>(mountableToPick)) {
+        qDebug() << "Picking up a weapon.";
+        // 武器：逻辑与护甲完全相同
+        Mountable* oldMountable = pickupMountable(aCharacter, mountableToPick);
+
+        // 如果有旧武器被替换下来
+        if (oldMountable) {
+            if (auto oldItem = dynamic_cast<QGraphicsItem*>(oldMountable)) {
+                // 将旧武器丢在当前新武器的位置
+                oldItem->setPos(itemToPick->pos());
+                oldMountable->unmount(); // 确保其可被再次拾取
+                qDebug() << "Dropped old weapon at" << oldItem->pos();
+            }
         }
     }
+    // 注意：这里的 if/else if 结构确保了每种物品只被处理一次。
 }
 
 // 【改动】重构 processPicking 以调用新的辅助函数
@@ -775,19 +936,24 @@ Mountable *BattleScene::findNearestUnmountedMountable(const QPointF &pos, qreal 
 }
 
 Mountable *BattleScene::pickupMountable(Character *character, Mountable *mountable) {
+    if (!character || !mountable) {
+        return nullptr;
+    }
+
+    // 【修改】处理护甲拾取逻辑
     if (auto armor = dynamic_cast<Armor *>(mountable)) {
+        // 调用 character->pickupArmor，它会正确地装备新护甲并返回旧护甲。
+        // 这个返回值就是被替换下来的护甲，我们需要将它返回给调用者（processCharacterPicking）。
         return character->pickupArmor(armor);
     }
-    // 新增：处理武器拾取
+    // 处理武器拾取逻辑 (保持不变)
     else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
-        // 获取角色当前装备的武器
         Weapon* oldWeapon = character->getWeapon();
-        // 装备新武器
         character->setWeapon(weapon);
         qDebug() << "Character equipped weapon with attack power:" << weapon->getAttackPower();
-        // 返回之前装备的武器（如果有的话）
         return oldWeapon;
     }
+
     return nullptr;
 }
 

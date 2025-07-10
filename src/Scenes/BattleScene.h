@@ -19,7 +19,9 @@
 #include "../Items/Consumables/Bandage.h"
 #include "../Items/Consumables/Medkit.h"
 #include "../Items/Consumables/Adrenaline.h"
-#include <QElapsedTimer>  // <-- 【新增】包含 QElapsedTimer
+#include <QElapsedTimer>
+#include "../Items/Armors/ChainmailArmor.h"
+#include "../Items/Armors/BulletproofVest.h"
 
 class BattleScene : public Scene {
     Q_OBJECT
@@ -40,6 +42,9 @@ public:
     
     // 新增：消耗品掉落处理函数
     void processConsumableDrop();
+
+    // 【新增】护甲掉落处理函数
+    void processArmorDrop();
 
 protected slots:
     void update() override;
@@ -62,10 +67,18 @@ private:
     // 新增：消耗品掉落相关辅助函数
     Consumable* createRandomConsumable();
     void updateFallingConsumables();
+
+    // 【新增】护甲掉落相关辅助函数
+    Armor* createRandomArmor();
+    void updateFallingArmors();
     
     // 新增：血条UI相关函数
     void initHealthBars();
     void updateHealthBars();
+
+    // 【新增】护甲UI相关函数
+    void initArmorDisplays();
+    void updateArmorDisplays();
 
     // 【新增】用于处理单个角色移动的辅助函数，避免代码重复
     void processCharacterMovement(Character* aCharacter);
@@ -97,7 +110,13 @@ private:
     QList<Consumable*> fallingConsumables;  // 正在下落的消耗品列表
     static constexpr qreal CONSUMABLE_FALL_SPEED = 10.0;  // 消耗品下落速度
     
+    // 【新增】护甲掉落相关成员变量
+    int armorDropFrameCounter{0};
+    static const int ARMOR_DROP_INTERVAL = 1200; // 1200帧 ≈ 20秒
+    QList<Armor*> fallingArmors;
+    static constexpr qreal ARMOR_FALL_SPEED = 10.0;
     // 新增：血条UI相关成员变量
+
     QGraphicsRectItem* characterHealthBarBg;  // 角色血条背景
     QGraphicsRectItem* characterHealthBarFg;  // 角色血条前景
     QGraphicsTextItem* characterHealthText;   // 角色血量文字
@@ -105,6 +124,9 @@ private:
     QGraphicsRectItem* enemyHealthBarFg;      // 敌人血条前景
     QGraphicsTextItem* enemyHealthText;       // 敌人血量文字
     
+    // 【新增】护甲UI相关成员变量
+    QGraphicsTextItem* characterArmorText;   // 角色护甲文字
+    QGraphicsTextItem* enemyArmorText;       // 敌人护甲文字
     static constexpr qreal HEALTH_BAR_WIDTH = 200.0;   // 血条宽度
     static constexpr qreal HEALTH_BAR_HEIGHT = 20.0;   // 血条高度
 };

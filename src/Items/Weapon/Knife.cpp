@@ -55,6 +55,10 @@ void Knife::slash(Character *attacker) {
     // - 金属碰撞音效
 }
 
+[[nodiscard]] WeaponType Knife::getWeaponType() const {
+    return WeaponType::Knife;
+}
+
 // 刺击攻击
 void Knife::stab(Character *attacker) {
     if (attacker == nullptr) {

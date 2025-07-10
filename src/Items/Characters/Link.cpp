@@ -5,7 +5,7 @@
 #include <memory>
 #include "Link.h"
 #include "../HeadEquipments/CapOfTheHero.h"
-#include "../Armors/OldShirt.h"
+#include "../Armors/BulletproofVest.h"
 #include "../LegEquipments/WellWornTrousers.h"
 
 Link::Link(QGraphicsItem *parent) : Character(parent) {

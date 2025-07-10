@@ -9,6 +9,9 @@ public:
     
     // 重写攻击方法，实现拳头特有的攻击效果
     void attack(Character *attacker) ;
+
+    // 【新增】实现类型获取
+    [[nodiscard]] WeaponType getWeaponType() const override;
 };
 
 #endif // QT_PROGRAMMING_2024_FIST_H

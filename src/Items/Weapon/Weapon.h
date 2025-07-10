@@ -7,6 +7,14 @@
 // 前向声明，避免循环依赖
 class Character;
 
+enum class WeaponType {
+    Fist,        // 拳头
+    Knife,       // 小刀
+    Rifle,
+    SniperRifle,
+    ShotPut    // 投掷物，如实心球
+};
+
 class Weapon : public Item, public Mountable {
 public:
     explicit Weapon(QGraphicsItem *parent, const QString &attackPower);
@@ -15,6 +23,9 @@ public:
     
     // 新增：获取攻击范围的getter函数
     [[nodiscard]] qreal getAttackRange() const;
+
+    // 【新增】获取武器类型的纯虚函数
+    [[nodiscard]] virtual WeaponType getWeaponType() const = 0;
 
     void attack(Character *attacker);
 
