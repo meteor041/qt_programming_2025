@@ -338,11 +338,8 @@ void BattleScene::processCombat() {
         if (isInAttackRange(character, enemy, character->getWeaponAttackRange())) {
             // 执行攻击
             character->performAttack();
-            
             // 对敌人造成伤害（这里设定基础伤害为20）
-            int damage = 20;
-            enemy->takeDamage(damage);
-            
+            enemy->takeDamage(character->getWeaponAttackPower());
             qDebug() << "Character attacked enemy! Enemy health:" << enemy->getHealth();
         } else {
             qDebug() << "Enemy is too far to attack!";
@@ -365,7 +362,17 @@ bool BattleScene::isInAttackRange(Character* attacker, Character* target, qreal 
     // 计算两个角色之间的距离
     qreal distance = QLineF(attackerPos, targetPos).length();
     
-    return distance <= range;
+    // 检查距离是否在攻击范围内
+    if (distance > range) {
+        return false;
+    }
+    
+    // 检查目标是否在攻击者面向的方向
+    bool targetIsOnRight = targetPos.x() > attackerPos.x();
+    bool attackerFacingRight = attacker->isFacingRight();
+    
+    // 只有当目标在攻击者面向的方向时才能攻击
+    return targetIsOnRight == attackerFacingRight;
 }
 
 

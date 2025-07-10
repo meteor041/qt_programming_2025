@@ -84,7 +84,7 @@ public:
     
     // 新增：获取所持武器攻击范围的函数
     [[nodiscard]] qreal getWeaponAttackRange() const;
-    
+    [[nodiscard]] qreal getWeaponAttackPower() const;
     // 新增：生命值系统
     [[nodiscard]] int getHealth() const;
     [[nodiscard]] int getMaxHealth() const;
@@ -96,6 +96,10 @@ public:
     // 新增：肾上腺素效果系统
     void startAdrenalineEffect(int duration, qreal speedMultiplier, int healPerFrame);
     void updateAdrenalineEffect(); // 在每帧更新中调用
+    
+    // 新增：朝向相关方法
+    [[nodiscard]] bool isFacingRight() const;
+    void setFacingRight(bool facingRight);
 
 protected:
     HeadEquipment *headEquipment{};
@@ -150,6 +154,9 @@ private:
     qreal adrenalineSpeedMultiplier{1.0}; // 肾上腺素速度倍率
     int adrenalineHealPerFrame{0};    // 每帧回血量
     int adrenalineHealCounter{0};     // 回血计数器
+    
+    // 新增：朝向相关变量
+    bool facingRight{true};           // 角色朝向，默认朝右
 };
 
 

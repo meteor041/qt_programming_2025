@@ -204,12 +204,16 @@ void Character::processInput() {
             targetHorizontalVelocity = -moveSpeed * totalSpeedMultiplier;
             setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(-1, 1));
+            // 更新朝向：向左移动时facingRight为false
+            setFacingRight(false);
         } else if (isRightDown()) {
             // 应用平台速度倍率和肾上腺素速度倍率
             qreal totalSpeedMultiplier = m_speedMultiplier * (adrenalineActive ? adrenalineSpeedMultiplier : 1.0);
             targetHorizontalVelocity = moveSpeed * totalSpeedMultiplier;
             setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(1, 1));
+            // 更新朝向：向右移动时facingRight为true
+            setFacingRight(true);
         }
         currentVelocity.setX(targetHorizontalVelocity);
 
@@ -374,6 +378,15 @@ qreal Character::getWeaponAttackRange() const {
     }
 }
 
+qreal Character::getWeaponAttackPower() const {
+    if (weapon != nullptr) {
+        return weapon->getAttackPower();
+    } else {
+        // 如果没有武器，返回默认的近身攻击范围
+        qDebug() << "No weapon equipped, using default attack power";
+        return 1; // 默认攻击力为1
+    }
+}
 // 在文件末尾添加以下方法实现
 
 // 生命值系统实现
@@ -450,5 +463,14 @@ void Character::updateAdrenalineEffect() {
         adrenalineSpeedMultiplier = 1.0;
         qDebug() << "Adrenaline effect ended";
     }
+}
+
+// 朝向相关方法实现
+bool Character::isFacingRight() const {
+    return facingRight;
+}
+
+void Character::setFacingRight(bool facingRight) {
+    this->facingRight = facingRight;
 }
 
