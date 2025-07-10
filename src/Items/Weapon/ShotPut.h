@@ -16,7 +16,10 @@ public:
     explicit ShotPut(QGraphicsItem *parent = nullptr, int throwCount = 3);
     
     // 重写攻击方法，实现投掷功能
-    void attack(Character *attacker) override;  // 添加 override 关键字
+    void attack(Character *attacker) override;
+    
+    // 【新增】实现基类的纯虚函数
+    [[nodiscard]] WeaponType getWeaponType() const override;
     
     // 获取剩余投掷次数
     [[nodiscard]] int getRemainingThrows() const;
@@ -40,6 +43,7 @@ class ShotPutProjectile : public QGraphicsEllipseItem {
 public:
     explicit ShotPutProjectile(QPointF startPos, bool facingRight, 
                               Character *thrower, BattleScene *scene,
+                              ShotPut *weapon, // 新增参数
                               QGraphicsItem *parent = nullptr);
     
     // 添加析构函数
@@ -59,6 +63,7 @@ private:
     QPointF initialVelocity; // 初始速度
     Character *thrower;      // 投掷者
     BattleScene *battleScene; // 战斗场景引用
+    ShotPut *sourceWeapon;  // 新增：保存武器引用
     bool markedForDeletion;  // 添加成员变量声明
     
     static constexpr qreal GRAVITY = 0.8;     // 重力加速度

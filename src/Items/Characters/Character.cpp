@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "../Weapon/Fist.h"
 #include <QDebug>
+#include <QGraphicsScene>
 
 // 【核心修改 B1】修改构造函数
 Character::Character(QGraphicsItem *parent)
@@ -49,7 +50,36 @@ Character::Character(QGraphicsItem *parent)
         qDebug() << "错误: 没有跳跃动画帧被加载。";
         jumpingAnimationFrames.append(standingPixmap); // 备用
     }
-    // --- 【修改结束】 ---
+
+    // 【新增】加载攻击动画（假设有6帧）
+    for (int i = 1; i < 7; ++i) {
+        QString frameName = QString(":/Biker_attack%1.png").arg(i);
+        QPixmap frame(frameName);
+        if (frame.isNull()) {
+            qDebug() << "警告: 攻击动画帧未找到:" << frameName;
+        } else {
+            attackingAnimationFrames.append(frame);
+        }
+    }
+    if (attackingAnimationFrames.isEmpty()) {
+        qDebug() << "错误: 没有攻击动画帧被加载。";
+        attackingAnimationFrames.append(standingPixmap); // 备用
+    }
+
+    // 【新增】加载受击动画（假设有2帧）
+    for (int i = 1; i < 3; ++i) {
+        QString frameName = QString(":/Biker_hit%1.png").arg(i);
+        QPixmap frame(frameName);
+        if (frame.isNull()) {
+            qDebug() << "警告: 受击动画帧未找到:" << frameName;
+        } else {
+            hitAnimationFrames.append(frame);
+        }
+    }
+    if (hitAnimationFrames.isEmpty()) {
+        qDebug() << "错误: 没有受击动画帧被加载。";
+        hitAnimationFrames.append(standingPixmap); // 备用
+    }
 
     if (crouchingPixmap.isNull()) {
         qDebug() << "Warning: Crouching pixmap not found.";
@@ -229,7 +259,35 @@ void Character::processInput() {
 }
 
 void Character::updateAppearanceAndState() {
-    // 1. 决定当前帧应该是什么状态
+    // 1. 【优先处理】一次性动画（攻击、受击）
+    if (currentState == Attacking || currentState == Hit) {
+        animationFrameTimer++;
+        QList<QPixmap>* currentAnimation = (currentState == Attacking) ? &attackingAnimationFrames : &hitAnimationFrames;
+
+        if (animationFrameTimer >= ANIMATION_FRAME_DURATION && !currentAnimation->isEmpty()) {
+            animationFrameTimer = 0;
+            animationFrameIndex++;
+
+            // 检查动画是否播放完毕
+            if (animationFrameIndex >= currentAnimation->size()) {
+                // 动画结束，恢复到之前的状态
+                currentState = previousState;
+                animationFrameIndex = 0;
+                // 立即根据恢复的状态设置图像，避免闪烁
+                // (这部分逻辑会在下面的常规状态处理中完成)
+            } else {
+                // 继续播放动画
+                characterPixmapItem->setPixmap(currentAnimation->at(animationFrameIndex));
+            }
+        }
+        // 如果正在播放一次性动画，直接返回，不进行下面的常规状态判断
+        if (currentState == Attacking || currentState == Hit) {
+            if (m_isInStealth) this->setOpacity(0.4); else this->setOpacity(1.0);
+            return;
+        }
+    }
+
+    // 2. 决定常规状态 (如果不在播放一次性动画)
     CharacterState newState;
     if (!isOnGround()) {
         newState = Jumping;
@@ -241,9 +299,8 @@ void Character::updateAppearanceAndState() {
         newState = Standing;
     }
 
-    // 2. 如果状态发生了变化，进行初始化处理
+    // 3. 如果状态发生变化，进行初始化处理
     if (newState != currentState) {
-        // 处理从下蹲 -> 非下蹲的高度变化
         if (currentState == Crouching && newState != Crouching) {
             setY(y() - (standingHeight - crouchingHeight));
         }
@@ -252,38 +309,30 @@ void Character::updateAppearanceAndState() {
         animationFrameIndex = 0;
         animationFrameTimer = 0;
 
-        // 【动画修复】在状态切换的瞬间，立即设置动画的第0帧
         switch (currentState) {
         case Standing:
             characterPixmapItem->setPixmap(standingPixmap);
             break;
         case Crouching:
-            // 处理从非下蹲 -> 下蹲的高度变化
             setY(y() + (standingHeight - crouchingHeight));
             characterPixmapItem->setPixmap(crouchingPixmap);
             break;
         case Running:
-            if (!runningAnimationFrames.isEmpty()) {
-                characterPixmapItem->setPixmap(runningAnimationFrames[0]);
-            }
+            if (!runningAnimationFrames.isEmpty()) characterPixmapItem->setPixmap(runningAnimationFrames[0]);
             break;
         case Jumping:
-            if (!jumpingAnimationFrames.isEmpty()) {
-                characterPixmapItem->setPixmap(jumpingAnimationFrames[0]);
-            }
+            if (!jumpingAnimationFrames.isEmpty()) characterPixmapItem->setPixmap(jumpingAnimationFrames[0]);
             break;
+        // Attacking 和 Hit 状态的启动不在这里处理，而是在触发函数中
         default:
             break;
         }
     }
 
-    // 3. 根据当前状态，【每帧】更新动画
+    // 4. 根据当前状态，【每帧】更新循环动画 (跑步/跳跃)
     animationFrameTimer++;
-
-    // 重置crouching标志位，它只在Crouching状态下为true
     crouching = (currentState == Crouching);
 
-    // 【动画修复】只在需要动画的状态下，才处理帧更新逻辑
     switch (currentState) {
     case Running:
         if (animationFrameTimer >= ANIMATION_FRAME_DURATION && !runningAnimationFrames.isEmpty()) {
@@ -299,16 +348,14 @@ void Character::updateAppearanceAndState() {
             characterPixmapItem->setPixmap(jumpingAnimationFrames[animationFrameIndex]);
         }
         break;
-    // Standing 和 Crouching 不需要每帧更新动画
-    case Standing:
-    case Crouching:
+    default:
         break;
     }
+
+    // 透明度效果
     if (m_isInStealth) {
-        // 如果处于隐身状态，设置半透明效果
-        this->setOpacity(0.4); // 0.2可能太透明了，可以调整为0.4试试
+        this->setOpacity(0.4);
     } else {
-        // 否则，恢复完全不透明
         this->setOpacity(1.0);
     }
 }
@@ -319,21 +366,30 @@ bool Character::isPicking() const {
 }
 
 Armor *Character::pickupArmor(Armor *newArmor) {
-    auto oldArmor = armor;
+    Armor *oldArmor = armor;
     if (oldArmor != nullptr) {
         oldArmor->unmount();
-        oldArmor->setPos(newArmor->pos());
+        // 将旧护甲放在新护甲原来的位置
+        if(newArmor) {
+            oldArmor->setPos(newArmor->pos());
+        }
         oldArmor->setParentItem(parentItem());
     }
-    newArmor->setParentItem(this);
-    newArmor->mountToParent();
+    if (newArmor != nullptr) {
+        newArmor->setParentItem(this);
+        newArmor->mountToParent();
+    }
     armor = newArmor;
-    return oldArmor;
+    return oldArmor; // 返回旧护甲，场景可以继续管理它
 }
 
 // 武器相关方法实现
 Weapon* Character::getWeapon() const {
     return weapon;
+}
+
+Armor* Character::getArmor() const {
+    return armor;
 }
 
 void Character::setWeapon(Weapon* newWeapon) {
@@ -360,6 +416,21 @@ void Character::setWeapon(Weapon* newWeapon) {
 // 在现有的武器相关方法后添加以下实现
 
 void Character::performAttack() {
+    // 如果正在播放其他一次性动画，则不允许攻击，避免动画冲突
+    if (currentState == Attacking || currentState == Hit) {
+        return;
+    }
+
+    // 触发攻击动画
+    if (!attackingAnimationFrames.isEmpty()) {
+        previousState = currentState; // 保存当前状态
+        currentState = Attacking;
+        animationFrameIndex = 0;
+        animationFrameTimer = 0;
+        characterPixmapItem->setPixmap(attackingAnimationFrames[0]); //立即显示第一帧
+    }
+
+    // 武器攻击逻辑（保持不变）
     if (weapon != nullptr) {
         weapon->attack(this);
     } else {
@@ -412,17 +483,55 @@ void Character::setHealth(int health) {
     }
 }
 
-void Character::takeDamage(int damage) {
-    if (dead) return; // 已死亡则不再受伤
-    
-    health -= damage;
+// 【修改】takeDamage函数以处理护甲逻辑
+void Character::takeDamage(int damage, Weapon* sourceWeapon) {
+    if (dead) return;
+
+    int finalDamage = damage;
+
+    // 如果装备了护甲，则先由护甲处理伤害
+    if (armor != nullptr) {
+        qDebug() << "Armor is processing damage...";
+        finalDamage = armor->processDamage(damage, sourceWeapon);
+
+        // 检查护甲是否在此次伤害后损坏
+        if (armor->isBroken()) {
+            qDebug() << "Armor broke and is being removed.";
+            // 从场景中移除并删除护甲对象
+            // 注意：直接删除可能会有问题，更好的做法是标记它，
+            // 然后在场景的主循环中安全地删除。
+            // 但为简化，我们先直接处理。
+            if(this->scene()){
+                this->scene()->removeItem(armor);
+            }
+            delete armor;
+            armor = nullptr;
+        }
+    }
+
+    // 如果仍有伤害，触发受击动画
+    if (finalDamage > 0) {
+        if (!hitAnimationFrames.isEmpty()) {
+            if (currentState != Hit) {
+                previousState = currentState;
+            }
+            currentState = Hit;
+            animationFrameIndex = 0;
+            animationFrameTimer = 0;
+            characterPixmapItem->setPixmap(hitAnimationFrames[0]);
+        }
+    }
+
+    // 角色承受最终伤害
+    health -= finalDamage;
     if (health <= 0) {
         health = 0;
         dead = true;
         qDebug() << "Character died!";
     }
-    qDebug() << "Character took" << damage << "damage, health:" << health;
+    qDebug() << "Character took" << finalDamage << "final damage, health:" << health;
 }
+
 
 void Character::heal(int amount) {
     if (dead) return; // 已死亡则无法治疗

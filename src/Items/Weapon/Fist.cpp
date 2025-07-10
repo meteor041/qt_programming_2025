@@ -20,6 +20,10 @@ Fist::Fist(QGraphicsItem *parent)
     mountToParent();
 }
 
+[[nodiscard]] WeaponType Fist::getWeaponType() const {
+    return WeaponType::Fist;
+}
+
 // 重写攻击方法，实现拳头特有的攻击效果
 void Fist::attack(Character *attacker) {
     if (attacker == nullptr) {

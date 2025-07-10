@@ -22,5 +22,17 @@
         <file>bandage.svg</file>
         <file>medkit.svg</file>
         <file>adrenaline.svg</file>
+        <file>Biker_attack1.png</file>
+        <file>Biker_attack2.png</file>
+        <file>Biker_attack3.png</file>
+        <file>Biker_attack4.png</file>
+        <file>Biker_attack5.png</file>
+        <file>Biker_attack6.png</file>
+        <file>Biker_hit1.png</file>
+        <file>Biker_hit2.png</file>
+        <file>ChainmailArmor.png</file>
+        <file>BulletproofVest.png</file>
+
+
     </qresource>
 </RCC>

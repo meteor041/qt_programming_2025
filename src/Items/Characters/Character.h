@@ -21,7 +21,9 @@ enum CharacterState {
     Standing,
     Running,
     Jumping,
-    Crouching
+    Crouching,
+    Attacking,
+    Hit
 };
 
 class Character : public Item {
@@ -76,6 +78,7 @@ public:
     void setCurrentPlatform(Platform* platform);
 
     Armor* pickupArmor(Armor* newArmor);
+    Armor* getArmor() const; // 【新增】获取当前护甲
     
     // 武器相关方法
     Weapon* getWeapon() const;
@@ -90,7 +93,7 @@ public:
     [[nodiscard]] int getMaxHealth() const;
     [[nodiscard]] bool isDead() const;
     void setHealth(int health);
-    void takeDamage(int damage);
+    void takeDamage(int damage,Weapon* sourceWeapon);
     void heal(int amount);
     
     // 新增：肾上腺素效果系统
@@ -125,16 +128,18 @@ private:
     
     // 【动画和状态管理变量】
     CharacterState currentState{Standing};
+    CharacterState previousState{Standing}; // 新增：用于在一次性动画后恢复状态
     int animationFrameIndex{0};
     int animationFrameTimer{0};
-    static const int ANIMATION_FRAME_DURATION = 12; // 动画帧切换速度
+    static const int ANIMATION_FRAME_DURATION = 8; // 动画帧切换速度
 
     // 【核心修改】为所有状态准备图片资源
     QPixmap standingPixmap;                 // 站立时的图片
     QPixmap crouchingPixmap;                // 下蹲时的图片
     QList<QPixmap> runningAnimationFrames;  // 跑步动画序列
     QList<QPixmap> jumpingAnimationFrames;  // 跳跃动画序列
-
+    QList<QPixmap> attackingAnimationFrames; // 新增：攻击动画序列
+    QList<QPixmap> hitAnimationFrames;       // 新增：受击动画序列
     qreal standingHeight;
     qreal crouchingHeight;
 

@@ -70,8 +70,9 @@ void ShotPut::throwShotPut(Character *attacker) {
     
     // 创建投掷物
     QPointF startPos = attacker->pos() + QPointF(attacker->isFacingRight() ? 50 : -50, -30);
+    // 创建投掷物时传入this指针
     ShotPutProjectile *projectile = new ShotPutProjectile(
-        startPos, attacker->isFacingRight(), attacker, battleScene
+        startPos, attacker->isFacingRight(), attacker, battleScene, this // 传入this
     );
     
     // 添加到场景和BattleScene的投掷物管理
@@ -103,8 +104,13 @@ bool ShotPut::canThrow() const {
 // 投掷物实现
 ShotPutProjectile::ShotPutProjectile(QPointF startPos, bool facingRight, 
                                    Character *thrower, BattleScene *scene,
+                                   ShotPut *weapon, // 新增参数
                                    QGraphicsItem *parent)
-    : QGraphicsEllipseItem(0, 0, 15, 15, parent), thrower(thrower), battleScene(scene), markedForDeletion(false)  {
+    : QGraphicsEllipseItem(0, 0, 15, 15, parent), 
+      thrower(thrower), 
+      battleScene(scene), 
+      sourceWeapon(weapon), // 初始化新成员
+      markedForDeletion(false) {
     
     // 设置起始位置
     setPos(startPos);
@@ -156,6 +162,7 @@ void ShotPutProjectile::updatePosition() {
     }
 }
 
+// 修复第185行的takeDamage调用
 void ShotPutProjectile::checkCollision() {
     if (markedForDeletion) return;
     // 获取碰撞的物品
@@ -181,8 +188,8 @@ void ShotPutProjectile::checkCollision() {
         if (character && character != thrower && !character->isDead()) {
             qDebug() << "ShotPut hit target! Dealing" << ShotPut::DAMAGE << "damage";
             
-            // 造成伤害
-            character->takeDamage(ShotPut::DAMAGE);
+            // 造成伤害 - 修复：传入sourceWeapon作为第二个参数
+            character->takeDamage(ShotPut::DAMAGE, sourceWeapon);
             
             // 直接删除对象
             markedForDeletion = true; // 标记删除
@@ -193,4 +200,10 @@ void ShotPutProjectile::checkCollision() {
 
 ShotPutProjectile::~ShotPutProjectile() {
     qDebug() << "ShotPutProjectile destroyed";
+}
+
+
+// 实现基类的纯虚函数
+WeaponType ShotPut::getWeaponType() const {
+    return WeaponType::ShotPut;
 }
