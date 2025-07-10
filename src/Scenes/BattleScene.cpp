@@ -53,6 +53,18 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     
     // 初始化血条UI
     initHealthBars();
+
+    // 【新增】初始化FPS显示
+    fpsTextItem = new QGraphicsTextItem();
+    fpsTextItem->setFont(QFont("Arial", 14, QFont::Bold));
+    fpsTextItem->setDefaultTextColor(Qt::yellow); // 使用醒目的颜色
+    // 将其放置在屏幕顶部中央
+    fpsTextItem->setPos(sceneRect().width() / 2 - 50, 10);
+    fpsTextItem->setZValue(103); // 确保在血条之上
+    addItem(fpsTextItem);
+
+    // 启动FPS计时器
+    fpsTimer.start();
 }
 
 // 【核心改动 #3】实现物理处理逻辑 (修正版)
@@ -463,8 +475,21 @@ bool BattleScene::isInAttackRange(Character* attacker, Character* target, qreal 
 }
 
 
-// 在现有的update()方法中添加武器掉落处理
 void BattleScene::update() {
+    // 【新增】FPS计算和显示逻辑
+    frameCount++;
+    // 每隔大约1秒更新一次FPS文本
+    if (fpsTimer.elapsed() > 1000) {
+        // 计算FPS（帧数 * 1000 / 经过的毫秒数）
+        qreal fps = (frameCount * 1000.0) / fpsTimer.elapsed();
+        fpsTextItem->setPlainText(QString("FPS: %1").arg(qRound(fps)));
+
+        // 重置计时器和帧计数器
+        fpsTimer.restart();
+        frameCount = 0;
+    }
+
+    // --- 原有的 update() 内容 ---
     // 添加战斗处理
     processCombat();
     // 添加武器掉落处理

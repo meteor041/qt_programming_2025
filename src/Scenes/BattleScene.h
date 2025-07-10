@@ -19,6 +19,7 @@
 #include "../Items/Consumables/Bandage.h"
 #include "../Items/Consumables/Medkit.h"
 #include "../Items/Consumables/Adrenaline.h"
+#include <QElapsedTimer>  // <-- 【新增】包含 QElapsedTimer
 
 class BattleScene : public Scene {
     Q_OBJECT
@@ -73,7 +74,10 @@ private:
     // 【新增】用于处理单个角色攻击逻辑的辅助函数
     void processCharacterCombat(Character* attacker, Character* target, bool& attackFlag);
 
-
+    // 【新增】用于显示FPS的成员变量
+    QGraphicsTextItem *fpsTextItem;   // 用于显示FPS的文本项
+    QElapsedTimer fpsTimer;           // 用于计时的计时器
+    int frameCount{0};                // 帧计数器
     Map *map;
     Character *character;
     Character *enemy;
