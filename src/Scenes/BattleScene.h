@@ -37,13 +37,22 @@ private:
     // 新增：战斗相关辅助函数
     bool isInAttackRange(Character* attacker, Character* target, qreal range = 100.0);
 
+    // 【新增】用于处理单个角色移动的辅助函数，避免代码重复
+    void processCharacterMovement(Character* aCharacter);
+    // 【新增】用于处理单个角色拾取的辅助函数
+    void processCharacterPicking(Character* aCharacter);
+
     Map *map;
     Character *character;
     Character *enemy;
-    Armor *spareArmor;
+    // spareArmor 成员变量应该被删掉，因为它在双人模式下会引起逻辑混乱。
+    // 现在我在做别的，就先不处理了
+     Armor *spareArmor;
+
     
-    // 新增：攻击按键状态
-    bool attackKeyDown{false};
+    // 新增：玩家1和玩家2的攻击按键状态
+    bool attackKeyDown{false};      // 玩家1 (K键)
+    bool enemyAttackKeyDown{false}; // 玩家2 (0键)
 };
 
 #endif //QT_PROGRAMMING_2024_BATTLESCENE_H

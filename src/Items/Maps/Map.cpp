@@ -84,7 +84,7 @@ QPointF Map::getSpawnPos() {
     QRectF platformRect = spawnPlatform->sceneBoundingRect();
 
     // 出生在平台的中点顶部
-    qreal spawnX = platformRect.center().x();
+    qreal spawnX = platformRect.center().x()+50;
     qreal spawnY = platformRect.top(); // 之后角色会因为重力站稳在平台上
 
     return {spawnX, spawnY - 50}; // 在平台上方一点出生，然后自然下落
