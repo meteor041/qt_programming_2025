@@ -35,7 +35,7 @@ Battlefield::Battlefield(QGraphicsScene* scene, QGraphicsItem *parent)
     // 3. 创建往上偏左的草地平台
     auto grassPlatform = new GrassPlatform();
     grassPlatform->setPos(0, 450);
-    grassPlatform->setVisualWidth(600);
+    grassPlatform->setVisualWidth(564);
     scene->addItem(grassPlatform);
     m_platforms.append(grassPlatform);
 

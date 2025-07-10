@@ -158,8 +158,7 @@ void BattleScene::processMovement() {
                                          newCharRect.left() < platformRect.right());
                 
                 // 检查垂直范围是否重叠
-                bool verticalOverlap = (newCharRect.bottom() > platformRect.top() && 
-                                       newCharRect.top() < platformRect.bottom());
+                bool verticalOverlap = newCharRect.intersects(platformRect);
                 
                 if (horizontalOverlap) {
                     // 1. 底部碰撞检测（角色下落撞到平台顶部）
@@ -198,6 +197,7 @@ void BattleScene::processMovement() {
                 
                 // 3. 左右侧碰撞检测（新增）
                 if (verticalOverlap) {
+                    qDebug() << "vertical overlap";
                     // 左侧碰撞检测（角色从左侧撞到平台）
                     if (character->getVelocity().x() > 0) { // 角色正在向右移动
                         qreal currentRight = currentCharRect.right();
