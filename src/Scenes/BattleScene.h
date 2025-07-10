@@ -14,6 +14,9 @@
 #include "../Items/Weapon/Knife.h"
 // 添加消耗品类的包含
 #include "../Items/Consumables/Consumable.h"
+#include "../Items/Consumables/Bandage.h"
+#include "../Items/Consumables/Medkit.h"
+#include "../Items/Consumables/Adrenaline.h"
 
 class BattleScene : public Scene {
     Q_OBJECT
@@ -31,6 +34,9 @@ public:
     
     // 新增：武器掉落处理函数
     void processWeaponDrop();
+    
+    // 新增：消耗品掉落处理函数
+    void processConsumableDrop();
 
 protected slots:
     void update() override;
@@ -49,6 +55,10 @@ private:
     // 新增：武器掉落相关辅助函数
     Weapon* createRandomWeapon();
     void updateFallingWeapons();
+    
+    // 新增：消耗品掉落相关辅助函数
+    Consumable* createRandomConsumable();
+    void updateFallingConsumables();
 
     Map *map;
     Character *character;
@@ -63,6 +73,12 @@ private:
     static const int WEAPON_DROP_INTERVAL = 900;  // 900帧 = 10秒
     QList<Weapon*> fallingWeapons;  // 正在下落的武器列表
     static constexpr qreal WEAPON_FALL_SPEED = 10.0;  // 武器下落速度
+    
+    // 新增：消耗品掉落相关成员变量
+    int consumableDropFrameCounter{0};  // 消耗品帧计数器
+    static const int CONSUMABLE_DROP_INTERVAL = 900;  // 900帧 = 15秒
+    QList<Consumable*> fallingConsumables;  // 正在下落的消耗品列表
+    static constexpr qreal CONSUMABLE_FALL_SPEED = 10.0;  // 消耗品下落速度
 };
 
 #endif //QT_PROGRAMMING_2024_BATTLESCENE_H

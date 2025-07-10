@@ -61,6 +61,14 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Items/Weapon/Fist.h
         src/Items/Weapon/Knife.cpp
         src/Items/Weapon/Knife.h
+        src/Items/Consumables/Consumable.cpp
+        src/Items/Consumables/Consumable.h
+        src/Items/Consumables/Bandage.cpp
+        src/Items/Consumables/Bandage.h
+        src/Items/Consumables/Medkit.cpp
+        src/Items/Consumables/Medkit.h
+        src/Items/Consumables/Adrenaline.cpp
+        src/Items/Consumables/Adrenaline.h
 
 )
 target_link_libraries(qt_programming_2024

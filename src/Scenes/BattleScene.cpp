@@ -372,6 +372,8 @@ void BattleScene::update() {
     processCombat();
     // 添加武器掉落处理
     processWeaponDrop();
+    // 添加消耗品掉落处理
+    processConsumableDrop();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
     Scene::update();
 }
@@ -542,4 +544,109 @@ Mountable *BattleScene::pickupMountable(Character *character, Mountable *mountab
         return oldWeapon;
     }
     return nullptr;
+}
+
+// 新增：消耗品掉落处理函数
+void BattleScene::processConsumableDrop() {
+    // 增加帧计数器
+    consumableDropFrameCounter++;
+    
+    // 检查是否到了掉落消耗品的时间（每900帧）
+    if (consumableDropFrameCounter >= CONSUMABLE_DROP_INTERVAL) {
+        // 重置计数器
+        consumableDropFrameCounter = 0;
+        
+        // 创建随机消耗品
+        Consumable* newConsumable = createRandomConsumable();
+        if (newConsumable) {
+            // 设置消耗品的随机X位置（屏幕顶部）
+            qreal randomX = QRandomGenerator::global()->bounded(static_cast<int>(50), static_cast<int>(sceneRect().width() - 50));
+            newConsumable->setPos(randomX, 0);  // Y轴为0（屏幕顶部）
+            
+            // 添加到场景中
+            addItem(newConsumable);
+            
+            // 添加到下落消耗品列表中
+            fallingConsumables.append(newConsumable);
+            
+            qDebug() << "Consumable dropped at position:" << randomX << ", 0";
+        }
+    }
+    
+    // 更新所有正在下落的消耗品
+    updateFallingConsumables();
+}
+
+// 新增：创建随机消耗品
+Consumable* BattleScene::createRandomConsumable() {
+    // 随机选择消耗品类型（0-2，对应Bandage、Medkit和Adrenaline）
+    int consumableType = QRandomGenerator::global()->bounded(3);
+    
+    Consumable* consumable = nullptr;
+    switch (consumableType) {
+        case 0:
+            consumable = new Bandage();
+            qDebug() << "Created Bandage consumable";
+            break;
+        case 1:
+            consumable = new Medkit();
+            qDebug() << "Created Medkit consumable";
+            break;
+        case 2:
+            consumable = new Adrenaline();
+            qDebug() << "Created Adrenaline consumable";
+            break;
+        default:
+            consumable = new Bandage();  // 默认创建绷带
+            break;
+    }
+    
+    return consumable;
+}
+
+// 新增：更新正在下落的消耗品
+void BattleScene::updateFallingConsumables() {
+    // 使用迭代器遍历，以便安全地删除元素
+    auto it = fallingConsumables.begin();
+    while (it != fallingConsumables.end()) {
+        Consumable* consumable = *it;
+        
+        // 更新消耗品位置（向下移动）
+        QPointF currentPos = consumable->pos();
+        QPointF newPos = currentPos + QPointF(0, CONSUMABLE_FALL_SPEED);
+        
+        // 检查消耗品是否落到地面上
+        bool hasLanded = false;
+        if (map) {
+            Platform* groundPlatform = map->getGroundPlatform(newPos, consumable->boundingRect().height());
+            if (groundPlatform) {
+                qreal surfaceY = groundPlatform->getSurfaceY();
+                qreal consumableBottom = newPos.y() + consumable->boundingRect().height();
+                
+                // 如果消耗品底部接触或穿过平台表面
+                if (consumableBottom >= surfaceY) {
+                    // 将消耗品放置在平台表面上
+                    newPos.setY(surfaceY - consumable->boundingRect().height());
+                    hasLanded = true;
+                }
+            }
+        }
+        
+        // 检查消耗品是否落到场景底部
+        if (newPos.y() + consumable->boundingRect().height() >= sceneRect().height() - 120) {
+            newPos.setY(sceneRect().height() - 120 - consumable->boundingRect().height());
+            hasLanded = true;
+        }
+        
+        // 更新消耗品位置
+        consumable->setPos(newPos);
+        
+        // 如果消耗品已经着陆，从下落列表中移除
+        if (hasLanded) {
+            qDebug() << "Consumable landed at position:" << newPos;
+            it = fallingConsumables.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
