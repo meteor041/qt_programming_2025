@@ -50,6 +50,9 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
         // 如果没找到平台（作为备用方案），放在一个安全的位置
         spareArmor->setPos(sceneRect().center());
     }
+    
+    // 初始化血条UI
+    initHealthBars();
 }
 
 // 【核心改动 #3】实现物理处理逻辑 (修正版)
@@ -374,6 +377,8 @@ void BattleScene::update() {
     processWeaponDrop();
     // 添加消耗品掉落处理
     processConsumableDrop();
+    // 更新血条UI
+    updateHealthBars();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
     Scene::update();
 }
@@ -476,6 +481,111 @@ void BattleScene::updateFallingWeapons() {
         } else {
             ++it;
         }
+    }
+}
+
+// 新增：初始化血条UI
+void BattleScene::initHealthBars() {
+    // 角色血条（左上角）
+    qreal characterBarX = 20;
+    qreal characterBarY = 20;
+    
+    // 角色血条背景
+    characterHealthBarBg = new QGraphicsRectItem(characterBarX, characterBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+    characterHealthBarBg->setBrush(QBrush(Qt::darkRed));
+    characterHealthBarBg->setPen(QPen(Qt::black, 2));
+    characterHealthBarBg->setZValue(100);  // 确保在最前面
+    addItem(characterHealthBarBg);
+    
+    // 角色血条前景
+    characterHealthBarFg = new QGraphicsRectItem(characterBarX, characterBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+    characterHealthBarFg->setBrush(QBrush(Qt::green));
+    characterHealthBarFg->setPen(QPen(Qt::transparent));
+    characterHealthBarFg->setZValue(101);
+    addItem(characterHealthBarFg);
+    
+    // 角色血量文字
+    characterHealthText = new QGraphicsTextItem();
+    characterHealthText->setPos(characterBarX, characterBarY + HEALTH_BAR_HEIGHT + 5);
+    characterHealthText->setDefaultTextColor(Qt::white);
+    characterHealthText->setFont(QFont("Arial", 12, QFont::Bold));
+    characterHealthText->setZValue(102);
+    addItem(characterHealthText);
+    
+    // 敌人血条（右上角）
+    qreal enemyBarX = sceneRect().width() - HEALTH_BAR_WIDTH - 20;
+    qreal enemyBarY = 20;
+    
+    // 敌人血条背景
+    enemyHealthBarBg = new QGraphicsRectItem(enemyBarX, enemyBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+    enemyHealthBarBg->setBrush(QBrush(Qt::darkRed));
+    enemyHealthBarBg->setPen(QPen(Qt::black, 2));
+    enemyHealthBarBg->setZValue(100);
+    addItem(enemyHealthBarBg);
+    
+    // 敌人血条前景
+    enemyHealthBarFg = new QGraphicsRectItem(enemyBarX, enemyBarY, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+    enemyHealthBarFg->setBrush(QBrush(Qt::red));
+    enemyHealthBarFg->setPen(QPen(Qt::transparent));
+    enemyHealthBarFg->setZValue(101);
+    addItem(enemyHealthBarFg);
+    
+    // 敌人血量文字
+    enemyHealthText = new QGraphicsTextItem();
+    enemyHealthText->setPos(enemyBarX, enemyBarY + HEALTH_BAR_HEIGHT + 5);
+    enemyHealthText->setDefaultTextColor(Qt::white);
+    enemyHealthText->setFont(QFont("Arial", 12, QFont::Bold));
+    enemyHealthText->setZValue(102);
+    addItem(enemyHealthText);
+}
+
+// 新增：更新血条UI
+void BattleScene::updateHealthBars() {
+    if (!character || !enemy) {
+        return;
+    }
+    
+    // 更新角色血条
+    int characterCurrentHealth = character->getHealth();
+    int characterMaxHealth = character->getMaxHealth();
+    qreal characterHealthRatio = static_cast<qreal>(characterCurrentHealth) / characterMaxHealth;
+    
+    // 更新角色血条宽度
+    QRectF characterRect = characterHealthBarFg->rect();
+    characterRect.setWidth(HEALTH_BAR_WIDTH * characterHealthRatio);
+    characterHealthBarFg->setRect(characterRect);
+    
+    // 更新角色血量文字
+    characterHealthText->setPlainText(QString("Player: %1/%2").arg(characterCurrentHealth).arg(characterMaxHealth));
+    
+    // 更新敌人血条
+    int enemyCurrentHealth = enemy->getHealth();
+    int enemyMaxHealth = enemy->getMaxHealth();
+    qreal enemyHealthRatio = static_cast<qreal>(enemyCurrentHealth) / enemyMaxHealth;
+    
+    // 更新敌人血条宽度
+    QRectF enemyRect = enemyHealthBarFg->rect();
+    enemyRect.setWidth(HEALTH_BAR_WIDTH * enemyHealthRatio);
+    enemyHealthBarFg->setRect(enemyRect);
+    
+    // 更新敌人血量文字
+    enemyHealthText->setPlainText(QString("Enemy: %1/%2").arg(enemyCurrentHealth).arg(enemyMaxHealth));
+    
+    // 根据血量变化血条颜色
+    if (characterHealthRatio > 0.6) {
+        characterHealthBarFg->setBrush(QBrush(Qt::green));
+    } else if (characterHealthRatio > 0.3) {
+        characterHealthBarFg->setBrush(QBrush(Qt::yellow));
+    } else {
+        characterHealthBarFg->setBrush(QBrush(Qt::red));
+    }
+    
+    if (enemyHealthRatio > 0.6) {
+        enemyHealthBarFg->setBrush(QBrush(Qt::green));
+    } else if (enemyHealthRatio > 0.3) {
+        enemyHealthBarFg->setBrush(QBrush(Qt::yellow));
+    } else {
+        enemyHealthBarFg->setBrush(QBrush(Qt::red));
     }
 }
 
