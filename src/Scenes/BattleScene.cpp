@@ -7,6 +7,7 @@
 #include "../Items/Maps/Battlefield.h"
 #include "../Items/Armors/FlamebreakerArmor.h"
 #include "../Items/Maps/platform/Platform.h" // 包含平台基类
+#include "../Items/Weapon/ShotPut.h" // 包含投掷物类
 
 // 构造函数：初始化整个战斗场景
 BattleScene::BattleScene(QObject *parent) : Scene(parent) {
@@ -408,20 +409,30 @@ void BattleScene::processCharacterCombat(Character* attacker, Character* target,
     }
 
     // 检查目标是否在攻击范围内
-    if (isInAttackRange(attacker, target, attacker->getWeaponAttackRange())) {
-        // 执行攻击动画/效果
-        attacker->performAttack();
-
-        // 从武器获取伤害值
-        int damage = attacker->getWeapon()->getAttackPower();
-        target->takeDamage(damage);
-
-       qDebug() << "Character attacked Character"
-                << "for" << damage << "damage! Target health:" << target->getHealth();
-    } else {
-       qDebug() << "Character tried to attack, but target is too far!";
+    Weapon* weapon = attacker->getWeapon();
+    if (!weapon) {
+        qDebug() << "No weapon equipped!";
+        return;
     }
+    // 根据武器类型执行不同的攻击逻辑
+    if (dynamic_cast<Fist*>(weapon) || dynamic_cast<Knife*>(weapon)) {
+        if (isInAttackRange(attacker, target, attacker->getWeaponAttackRange())) {
+            // 执行攻击动画/效果
+            attacker->performAttack();
 
+            // 从武器获取伤害值
+            int damage = attacker->getWeapon()->getAttackPower();
+            target->takeDamage(damage);
+
+            qDebug() << "Character attacked Character"
+                    << "for" << damage << "damage! Target health:" << target->getHealth();
+        } else {
+            qDebug() << "Character tried to attack, but target is too far!";
+        }
+    } else if (dynamic_cast<ShotPut*>(weapon)) {
+        // ShotPut 只执行 performAttack
+        attacker->performAttack();
+    }
     // 重置攻击状态，实现单次按下、单次攻击
     attackFlag = false;
 }
@@ -472,6 +483,8 @@ void BattleScene::update() {
     processWeaponDrop();
     // 添加消耗品掉落处理
     processConsumableDrop();
+    // 添加投掷物处理
+    processProjectiles();
     // 更新血条UI
     updateHealthBars();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
@@ -510,22 +523,27 @@ void BattleScene::processWeaponDrop() {
 }
 
 // 新增：创建随机武器
+// 在 createRandomWeapon() 函数中修改
 Weapon* BattleScene::createRandomWeapon() {
-    // 随机选择武器类型（不包括Weapon基类）
-    int weaponType = QRandomGenerator::global()->bounded(2);  // 0-1，对应Fist和Knife
+    // 随机选择武器类型（现在包括实心球）
+    int weaponType = QRandomGenerator::global()->bounded(2);  // 0-2，对应Fist、Knife、ShotPut
     
     Weapon* weapon = nullptr;
     switch (weaponType) {
+        // case 0:
+        //     weapon = new Fist();
+        //     qDebug() << "Created Fist weapon";
+        //     break;
         case 0:
-            weapon = new Fist();
-            qDebug() << "Created Fist weapon";
-            break;
-        case 1:
             weapon = new Knife();
             qDebug() << "Created Knife weapon";
             break;
+        case 1:
+            weapon = new ShotPut(nullptr, 3); // 3次投掷
+            qDebug() << "Created ShotPut weapon";
+            break;
         default:
-            weapon = new Fist();  // 默认创建拳头
+            weapon = new Fist();
             break;
     }
     
@@ -868,5 +886,43 @@ void BattleScene::updateFallingConsumables() {
         } else {
             ++it;
         }
+    }
+}
+
+// 新增：添加投掷物到管理列表
+void BattleScene::addProjectile(ShotPutProjectile* projectile) {
+    if (projectile) {
+        projectiles.append(projectile);
+        qDebug() << "Added projectile to BattleScene management, total:" << projectiles.size();
+    }
+}
+
+// 新增：处理所有投掷物的更新和碰撞检测
+void BattleScene::processProjectiles() {
+    // 使用迭代器遍历，以便安全地删除元素
+    auto it = projectiles.begin();
+    while (it != projectiles.end()) {
+        ShotPutProjectile* projectile = *it;
+        
+        // 检查投掷物是否仍然有效
+        if (!projectile) {
+            // 投掷物已被删除或不在当前场景中，从列表中移除
+            it = projectiles.erase(it);
+            continue;
+        }
+         // 检查是否标记为删除
+        if (projectile->isMarkedForDeletion()) {
+            removeItem(projectile);
+            delete projectile;
+            it = projectiles.erase(it);
+            continue;
+        }
+        // 更新投掷物位置
+        projectile->updatePosition();
+        
+        // 检查碰撞
+        projectile->checkCollision();
+        
+        ++it;
     }
 }

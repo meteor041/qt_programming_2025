@@ -16,7 +16,7 @@ public:
     // 新增：获取攻击范围的getter函数
     [[nodiscard]] qreal getAttackRange() const;
 
-    void attack(Character *attacker);
+    virtual void attack(Character *attacker);  // 添加 virtual 关键字
 
 protected:
     int attackPower;

@@ -14,6 +14,7 @@
 // 添加武器类的包含
 #include "../Items/Weapon/Fist.h"
 #include "../Items/Weapon/Knife.h"
+#include "../Items/Weapon/ShotPut.h"
 // 添加消耗品类的包含
 #include "../Items/Consumables/Consumable.h"
 #include "../Items/Consumables/Bandage.h"
@@ -39,9 +40,13 @@ public:
     
     // 新增：消耗品掉落处理函数
     void processConsumableDrop();
+    
+    // 新增：投掷物管理函数
+    void addProjectile(ShotPutProjectile* projectile);
+    void processProjectiles();
 
 protected slots:
-    void update() override;
+    void update();  // 移除 override 关键字
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -92,6 +97,9 @@ private:
     static const int CONSUMABLE_DROP_INTERVAL = 900;  // 900帧 = 15秒
     QList<Consumable*> fallingConsumables;  // 正在下落的消耗品列表
     static constexpr qreal CONSUMABLE_FALL_SPEED = 10.0;  // 消耗品下落速度
+    
+    // 新增：投掷物管理相关成员变量
+    QList<ShotPutProjectile*> projectiles;  // 活跃的投掷物列表
     
     // 新增：血条UI相关成员变量
     QGraphicsRectItem* characterHealthBarBg;  // 角色血条背景

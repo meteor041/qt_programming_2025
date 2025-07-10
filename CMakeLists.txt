@@ -61,6 +61,8 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Items/Weapon/Fist.h
         src/Items/Weapon/Knife.cpp
         src/Items/Weapon/Knife.h
+        src/Items/Weapon/ShotPut.cpp
+        src/Items/Weapon/ShotPut.h
         src/Items/Consumables/Consumable.cpp
         src/Items/Consumables/Consumable.h
         src/Items/Consumables/Bandage.cpp
