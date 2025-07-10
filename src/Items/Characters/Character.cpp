@@ -319,18 +319,23 @@ Weapon* Character::getWeapon() const {
 }
 
 void Character::setWeapon(Weapon* newWeapon) {
+    QPointF oldWeaponPos;
     if (weapon != nullptr && weapon != newWeapon) {
         // 卸载当前武器
+        oldWeaponPos = weapon->pos();
+        weapon->setPos(newWeapon->pos());
         weapon->unmount();
         weapon->setParentItem(parentItem());
     }
     
     if (newWeapon != nullptr) {
         // 装备新武器
+        if (weapon != nullptr) {
+            newWeapon->setPos(oldWeaponPos);
+        }
         newWeapon->setParentItem(this);
         newWeapon->mountToParent();
     }
-    
     weapon = newWeapon;
 }
 

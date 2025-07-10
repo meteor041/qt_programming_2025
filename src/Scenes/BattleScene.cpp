@@ -366,19 +366,137 @@ bool BattleScene::isInAttackRange(Character* attacker, Character* target, qreal 
 }
 
 
+// 在现有的update()方法中添加武器掉落处理
 void BattleScene::update() {
     // 添加战斗处理
     processCombat();
+    // 添加武器掉落处理
+    processWeaponDrop();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
     Scene::update();
+}
+
+// 新增：武器掉落处理函数
+void BattleScene::processWeaponDrop() {
+    // 增加帧计数器
+    weaponDropFrameCounter++;
+    
+    // 检查是否到了掉落武器的时间（每900帧）
+    if (weaponDropFrameCounter >= WEAPON_DROP_INTERVAL) {
+        // 重置计数器
+        weaponDropFrameCounter = 0;
+        
+        // 创建随机武器
+        Weapon* newWeapon = createRandomWeapon();
+        if (newWeapon) {
+            // 设置武器的随机X位置（屏幕顶部）
+            qreal randomX = QRandomGenerator::global()->bounded(static_cast<int>(50), static_cast<int>(sceneRect().width() - 50));
+            newWeapon->setPos(randomX, 0);  // Y轴为0（屏幕顶部）
+            
+            // 添加到场景中
+            addItem(newWeapon);
+            
+            // 添加到下落武器列表中
+            fallingWeapons.append(newWeapon);
+            
+            qDebug() << "Weapon dropped at position:" << randomX << ", 0";
+        }
+    }
+    
+    // 更新所有正在下落的武器
+    updateFallingWeapons();
+}
+
+// 新增：创建随机武器
+Weapon* BattleScene::createRandomWeapon() {
+    // 随机选择武器类型（不包括Weapon基类）
+    int weaponType = QRandomGenerator::global()->bounded(2);  // 0-1，对应Fist和Knife
+    
+    Weapon* weapon = nullptr;
+    switch (weaponType) {
+        case 0:
+            weapon = new Fist();
+            qDebug() << "Created Fist weapon";
+            break;
+        case 1:
+            weapon = new Knife();
+            qDebug() << "Created Knife weapon";
+            break;
+        default:
+            weapon = new Fist();  // 默认创建拳头
+            break;
+    }
+    
+    return weapon;
+}
+
+// 新增：更新正在下落的武器
+void BattleScene::updateFallingWeapons() {
+    // 使用迭代器遍历，以便安全地删除元素
+    auto it = fallingWeapons.begin();
+    while (it != fallingWeapons.end()) {
+        Weapon* weapon = *it;
+        
+        // 更新武器位置（向下移动）
+        QPointF currentPos = weapon->pos();
+        QPointF newPos = currentPos + QPointF(0, WEAPON_FALL_SPEED);
+        
+        // 检查武器是否落到地面上
+        bool hasLanded = false;
+        if (map) {
+            Platform* groundPlatform = map->getGroundPlatform(newPos, weapon->boundingRect().height());
+            if (groundPlatform) {
+                qreal surfaceY = groundPlatform->getSurfaceY();
+                qreal weaponBottom = newPos.y() + weapon->boundingRect().height();
+                
+                // 如果武器底部接触或穿过平台表面
+                if (weaponBottom >= surfaceY) {
+                    // 将武器放置在平台表面上
+                    newPos.setY(surfaceY - weapon->boundingRect().height());
+                    hasLanded = true;
+                }
+            }
+        }
+        
+        // 检查武器是否落到场景底部
+        if (newPos.y() + weapon->boundingRect().height() >= sceneRect().height() - 120) {
+            newPos.setY(sceneRect().height() - 120 - weapon->boundingRect().height());
+            hasLanded = true;
+        }
+        
+        // 更新武器位置
+        weapon->setPos(newPos);
+        
+        // 如果武器已经着陆，从下落列表中移除
+        if (hasLanded) {
+            qDebug() << "Weapon landed at position:" << newPos;
+            it = fallingWeapons.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void BattleScene::processPicking() {
     Scene::processPicking();
     if (character && character->isPicking()) {
         auto mountable = findNearestUnmountedMountable(character->pos(), 100.);
+        qDebug() << mountable;
         if (mountable != nullptr) {
-            spareArmor = dynamic_cast<Armor *>(pickupMountable(character, mountable));
+            // 检查是否是盔甲
+            if (auto armor = dynamic_cast<Armor *>(mountable)) {
+                spareArmor = dynamic_cast<Armor *>(pickupMountable(character, mountable));
+            }
+            // 检查是否是武器
+            else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
+                // 拾取武器，如果角色之前有武器，旧武器会被放置在当前位置
+                Weapon* oldWeapon = dynamic_cast<Weapon *>(pickupMountable(character, mountable));
+                // if (oldWeapon) {
+                //     // 将旧武器放置在拾取位置
+                //     oldWeapon->setPos(dynamic_cast<QGraphicsItem*>(mountable)->pos());
+                //     qDebug() << "Dropped old weapon at position:" << dynamic_cast<QGraphicsItem*>(mountable)->pos();
+                // }
+            }
         }
     }
 }
@@ -403,6 +521,16 @@ Mountable *BattleScene::findNearestUnmountedMountable(const QPointF &pos, qreal 
 Mountable *BattleScene::pickupMountable(Character *character, Mountable *mountable) {
     if (auto armor = dynamic_cast<Armor *>(mountable)) {
         return character->pickupArmor(armor);
+    }
+    // 新增：处理武器拾取
+    else if (auto weapon = dynamic_cast<Weapon *>(mountable)) {
+        // 获取角色当前装备的武器
+        Weapon* oldWeapon = character->getWeapon();
+        // 装备新武器
+        character->setWeapon(weapon);
+        qDebug() << "Character equipped weapon with attack power:" << weapon->getAttackPower();
+        // 返回之前装备的武器（如果有的话）
+        return oldWeapon;
     }
     return nullptr;
 }
