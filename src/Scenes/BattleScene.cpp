@@ -415,6 +415,7 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
 // 【新增】处理单个角色攻击的辅助函数
 void BattleScene::processCharacterCombat(Character* attacker, Character* target, bool& attackFlag) {
     if (!attacker || !target || !attackFlag || attacker->isDead()) {
+        // qDebug() << "processCharacterCombat: Invalid parameters or attacker is dead";
         return;
     }
 
@@ -427,10 +428,10 @@ void BattleScene::processCharacterCombat(Character* attacker, Character* target,
         int damage = attacker->getWeapon()->getAttackPower();
         target->takeDamage(damage);
 
- //       qDebug() << attacker->metaObject()->className() << "attacked" << target->metaObject()->className()
-//                 << "for" << damage << "damage! Target health:" << target->getHealth();
+       qDebug() << "Character attacked Character"
+                << "for" << damage << "damage! Target health:" << target->getHealth();
     } else {
- //       qDebug() << attacker->metaObject()->className() << "tried to attack, but target is too far!";
+       qDebug() << "Character tried to attack, but target is too far!";
     }
 
     // 重置攻击状态，实现单次按下、单次攻击

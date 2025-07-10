@@ -9,10 +9,10 @@
 #include "../LegEquipments/WellWornTrousers.h"
 
 Link::Link(QGraphicsItem *parent) : Character(parent) {
-    headEquipment = new CapOfTheHero(this);
-    legEquipment = new WellWornTrousers(this);
-    armor = new OldShirt(this);
-    headEquipment->mountToParent();
-    legEquipment->mountToParent();
-    armor->mountToParent();
+    // headEquipment = new CapOfTheHero(this);
+    // legEquipment = new WellWornTrousers(this);
+    // armor = new OldShirt(this);
+    // headEquipment->mountToParent();
+    // legEquipment->mountToParent();
+    // armor->mountToParent();
 }
