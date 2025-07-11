@@ -220,6 +220,11 @@ void Character::processInput() {
     // 3. 【重大改动】根据【新】的状态来决定行为
     QPointF currentVelocity = getVelocity();
 
+    // 如果正在受击，则不允许移动
+    if (hitStateTimer > 0) {
+        currentVelocity.setX(0);
+    }
+
     // 如果正在下蹲，则强制水平速度为0
     if (currentState == Crouching) {
         currentVelocity.setX(0);
@@ -259,10 +264,33 @@ void Character::processInput() {
 }
 
 void Character::updateAppearanceAndState() {
-    // 1. 【优先处理】一次性动画（攻击、受击）
-    if (currentState == Attacking || currentState == Hit) {
+    // 1. 【核心修改】最优先处理受击状态的计时和恢复
+    if (hitStateTimer > 0) {
+        hitStateTimer--; // 每帧减少计时
+
+        // 确保在受击状态时显示的是第二张图
+        if (hitAnimationFrames.size() > 1) {
+            characterPixmapItem->setPixmap(hitAnimationFrames.at(1));
+        }
+
+        if (hitStateTimer <= 0) {
+            // 受击状态结束，强制恢复到站立状态
+            currentState = Standing;
+            characterPixmapItem->setPixmap(standingPixmap);
+            // 确保动画参数被重置
+            animationFrameIndex = 0;
+            animationFrameTimer = 0;
+        }
+
+        // 如果仍在受击状态，则直接返回，不执行下面的任何逻辑
+        if (m_isInStealth) this->setOpacity(0.4); else this->setOpacity(1.0);
+        return;
+    }
+
+    // 2. 处理一次性动画（现在只剩下攻击）
+    if (currentState == Attacking) {
         animationFrameTimer++;
-        QList<QPixmap>* currentAnimation = (currentState == Attacking) ? &attackingAnimationFrames : &hitAnimationFrames;
+        QList<QPixmap>* currentAnimation = &attackingAnimationFrames;
 
         if (animationFrameTimer >= ANIMATION_FRAME_DURATION && !currentAnimation->isEmpty()) {
             animationFrameTimer = 0;
@@ -273,15 +301,13 @@ void Character::updateAppearanceAndState() {
                 // 动画结束，恢复到之前的状态
                 currentState = previousState;
                 animationFrameIndex = 0;
-                // 立即根据恢复的状态设置图像，避免闪烁
-                // (这部分逻辑会在下面的常规状态处理中完成)
             } else {
                 // 继续播放动画
                 characterPixmapItem->setPixmap(currentAnimation->at(animationFrameIndex));
             }
         }
-        // 如果正在播放一次性动画，直接返回，不进行下面的常规状态判断
-        if (currentState == Attacking || currentState == Hit) {
+        // 如果正在播放一次性动画，直接返回
+        if (currentState == Attacking) {
             if (m_isInStealth) this->setOpacity(0.4); else this->setOpacity(1.0);
             return;
         }
@@ -511,15 +537,20 @@ void Character::takeDamage(int damage, Weapon* sourceWeapon) {
 
     // 如果仍有伤害，触发受击动画
     if (finalDamage > 0) {
-        if (!hitAnimationFrames.isEmpty()) {
-            if (currentState != Hit) {
-                previousState = currentState;
-            }
-            currentState = Hit;
-            animationFrameIndex = 0;
-            animationFrameTimer = 0;
-            characterPixmapItem->setPixmap(hitAnimationFrames[0]);
+        // 在进入受击状态前，检查是否需要从下蹲状态中恢复
+        if (currentState == Crouching) {
+            // 如果当前是下蹲状态，必须先恢复Y坐标，否则会掉下去！
+            setY(y() - (standingHeight - crouchingHeight));
+            crouching = false; // 确保下蹲状态被完全重置
         }
+        //
+        // 【核心修改】启动受击状态计时器
+        hitStateTimer = 30; // 设置或重置受击状态持续90帧
+        currentState = Hit; // 立即进入受击状态，这会阻止其他动画播放
+        animationFrameIndex = 0; // 重置动画帧，以防万一
+        animationFrameTimer = 0;
+
+        // 【核心修改】这里不再播放动画，而是在updateAppearanceAndState中强制显示第二张图
     }
 
     // 角色承受最终伤害

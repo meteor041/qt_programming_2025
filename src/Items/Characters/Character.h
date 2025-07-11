@@ -132,6 +132,8 @@ private:
     int animationFrameIndex{0};
     int animationFrameTimer{0};
     static const int ANIMATION_FRAME_DURATION = 8; // 动画帧切换速度
+    // 【新增】受击状态计时器
+    int hitStateTimer{0}; // > 0 表示处于受击状态，值为剩余帧数
 
     // 【核心修改】为所有状态准备图片资源
     QPixmap standingPixmap;                 // 站立时的图片
