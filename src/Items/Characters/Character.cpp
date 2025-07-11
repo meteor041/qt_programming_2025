@@ -94,13 +94,19 @@ Character::Character(QGraphicsItem *parent)
     characterPixmapItem = new QGraphicsPixmapItem(this); // 设为this的子项
     characterPixmapItem->setPixmap(standingPixmap);     // 设置初始外观
 
+    // --- 【问题修复】在这里一次性设置变换原点 ---
+    // 设置变换原点为图形的中心。这确保了翻转是围绕中心进行的。
+    // 这个设置只需要在构造函数中执行一次。
+    setTransformOriginPoint(characterPixmapItem->boundingRect().center());
+    // --- 修复结束 ---
+
     // (调试用椭圆，保持不变)
     ellipseItem = new QGraphicsEllipseItem(-5, -5, 10, 10, this);
     ellipseItem->setBrush(Qt::green);
     ellipseItem->setZValue(1);
     // 初始化默认武器：拳头
     weapon = new Fist(this);
-    
+
     // 初始化肾上腺素效果相关变量
     adrenalineActive = false;
     adrenalineTimer = 0;
@@ -118,93 +124,32 @@ QRectF Character::boundingRect() const {
     return {};
 }
 
-bool Character::isLeftDown() const {
-    return leftDown;
-}
-
-void Character::setLeftDown(bool leftDown) {
-    Character::leftDown = leftDown;
-}
-
-bool Character::isRightDown() const {
-    return rightDown;
-}
-
-void Character::setRightDown(bool rightDown) {
-    Character::rightDown = rightDown;
-}
-
-
-void Character::setJumpDown(bool jumpDown) {
-    Character::jumpDown = jumpDown;
-}
-
-bool Character::isJumpDown() const {
-    return jumpDown;
-}
-
-bool Character::isPickDown() const {
-    return pickDown;
-}
-
-void Character::setOnGround(bool onGround) {
-    Character::onGround = onGround;
-}
-
-bool Character::isOnGround() const {
-    return onGround;
-}
-
-bool Character::isCrouchDown() const {
-    return crouchDown;
-}
-
-void Character::setCrouchDown(bool crouchDown) {
-    Character::crouchDown = crouchDown;
-}
-
-bool Character::isCrouching() const {
-    return crouching;
-}
-
-void Character::setPickDown(bool pickDown) {
-    Character::pickDown = pickDown;
-}
-
-const QPointF &Character::getVelocity() const {
-    return velocity;
-}
-
-void Character::setVelocity(const QPointF &velocity) {
-    Character::velocity = velocity;
-}
-
-// --- 【核心改动 1】: 实现新增的公共方法 ---
-void Character::setSpeedMultiplier(qreal multiplier) {
-    m_speedMultiplier = multiplier;
-}
-
-void Character::setInStealth(bool stealth) {
-    // 只有在状态改变时才打印，避免刷屏
-    if (m_isInStealth != stealth) {
-        m_isInStealth = stealth;
-        qDebug() << "Character stealth status:" << m_isInStealth;
-    }
-}
-
-Platform* Character::getCurrentPlatform() const {
-    return m_currentPlatform;
-}
-
-void Character::setCurrentPlatform(Platform* platform) {
-    m_currentPlatform = platform;
-}
+// ... (其他 getter/setter 函数保持不变) ...
+bool Character::isLeftDown() const { return leftDown; }
+void Character::setLeftDown(bool leftDown) { Character::leftDown = leftDown; }
+bool Character::isRightDown() const { return rightDown; }
+void Character::setRightDown(bool rightDown) { Character::rightDown = rightDown; }
+void Character::setJumpDown(bool jumpDown) { Character::jumpDown = jumpDown; }
+bool Character::isJumpDown() const { return jumpDown; }
+bool Character::isPickDown() const { return pickDown; }
+void Character::setOnGround(bool onGround) { Character::onGround = onGround; }
+bool Character::isOnGround() const { return onGround; }
+bool Character::isCrouchDown() const { return crouchDown; }
+void Character::setCrouchDown(bool crouchDown) { Character::crouchDown = crouchDown; }
+bool Character::isCrouching() const { return crouching; }
+void Character::setPickDown(bool pickDown) { Character::pickDown = pickDown; }
+const QPointF &Character::getVelocity() const { return velocity; }
+void Character::setVelocity(const QPointF &velocity) { Character::velocity = velocity; }
+void Character::setSpeedMultiplier(qreal multiplier) { m_speedMultiplier = multiplier; }
+void Character::setInStealth(bool stealth) { if (m_isInStealth != stealth) { m_isInStealth = stealth; qDebug() << "Character stealth status:" << m_isInStealth; } }
+Platform* Character::getCurrentPlatform() const { return m_currentPlatform; }
+void Character::setCurrentPlatform(Platform* platform) { m_currentPlatform = platform; }
 
 
 void Character::processInput() {
     // 0. 更新肾上腺素效果
     updateAdrenalineEffect();
-    
+
     // 1. 处理拾取状态 (这必须在最前面，以决定本帧是否在执行拾取动作)
     if (!lastPickDown && pickDown) {
         picking = true;
@@ -237,7 +182,8 @@ void Character::processInput() {
             // 应用平台速度倍率和肾上腺素速度倍率
             qreal totalSpeedMultiplier = m_speedMultiplier * (adrenalineActive ? adrenalineSpeedMultiplier : 1.0);
             targetHorizontalVelocity = -moveSpeed * totalSpeedMultiplier;
-            setTransformOriginPoint(boundingRect().center());
+            // --- 【问题修复】删除此处的 setTransformOriginPoint ---
+            // setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(-1, 1));
             // 更新朝向：向左移动时facingRight为false
             setFacingRight(false);
@@ -245,7 +191,8 @@ void Character::processInput() {
             // 应用平台速度倍率和肾上腺素速度倍率
             qreal totalSpeedMultiplier = m_speedMultiplier * (adrenalineActive ? adrenalineSpeedMultiplier : 1.0);
             targetHorizontalVelocity = moveSpeed * totalSpeedMultiplier;
-            setTransformOriginPoint(boundingRect().center());
+            // --- 【问题修复】删除此处的 setTransformOriginPoint ---
+            // setTransformOriginPoint(boundingRect().center());
             setTransform(QTransform().scale(1, 1));
             // 更新朝向：向右移动时facingRight为true
             setFacingRight(true);
@@ -263,6 +210,7 @@ void Character::processInput() {
     setVelocity(currentVelocity);
 }
 
+// ... (文件剩余部分保持不变) ...
 void Character::updateAppearanceAndState() {
     // 1. 【核心修改】最优先处理受击状态的计时和恢复
     if (hitStateTimer > 0) {
@@ -427,7 +375,7 @@ void Character::setWeapon(Weapon* newWeapon) {
         weapon->unmount();
         weapon->setParentItem(parentItem());
     }
-    
+
     if (newWeapon != nullptr) {
         // 装备新武器
         if (weapon != nullptr) {
@@ -566,7 +514,7 @@ void Character::takeDamage(int damage, Weapon* sourceWeapon) {
 
 void Character::heal(int amount) {
     if (dead) return; // 已死亡则无法治疗
-    
+
     health = qMin(health + amount, maxHealth);
     qDebug() << "Character healed" << amount << "health, current health:" << health;
 }
@@ -578,25 +526,25 @@ void Character::startAdrenalineEffect(int duration, qreal speedMultiplier, int h
     adrenalineSpeedMultiplier = speedMultiplier;
     adrenalineHealPerFrame = healPerFrame;
     adrenalineHealCounter = 0;
-    
-    qDebug() << "Adrenaline effect started: duration =" << duration 
-             << ", speed multiplier =" << speedMultiplier 
+
+    qDebug() << "Adrenaline effect started: duration =" << duration
+             << ", speed multiplier =" << speedMultiplier
              << ", heal per frame =" << healPerFrame;
 }
 
 void Character::updateAdrenalineEffect() {
     if (!adrenalineActive) return;
-    
+
     // 减少剩余时间
     adrenalineTimer--;
-    
+
     // 处理持续回血（每60帧回血一次）
     adrenalineHealCounter++;
     if (adrenalineHealCounter >= 60) {
         heal(adrenalineHealPerFrame);
         adrenalineHealCounter = 0;
     }
-    
+
     // 检查效果是否结束
     if (adrenalineTimer <= 0) {
         adrenalineActive = false;
@@ -613,4 +561,3 @@ bool Character::isFacingRight() const {
 void Character::setFacingRight(bool facingRight) {
     this->facingRight = facingRight;
 }
-

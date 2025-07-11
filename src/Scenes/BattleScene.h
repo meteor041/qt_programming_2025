@@ -91,6 +91,9 @@ private:
     // 【新增】用于处理单个角色攻击逻辑的辅助函数
     void processCharacterCombat(Character* attacker, Character* target, bool& attackFlag);
 
+    // 【新增】游戏结束相关辅助函数
+    void showGameOverScreen(const QString& winnerName);
+
     // 【新增】用于显示FPS的成员变量
     QGraphicsTextItem *fpsTextItem;   // 用于显示FPS的文本项
     QElapsedTimer fpsTimer;           // 用于计时的计时器
@@ -136,6 +139,9 @@ private:
     QGraphicsTextItem* enemyArmorText;       // 敌人护甲文字
     static constexpr qreal HEALTH_BAR_WIDTH = 200.0;   // 血条宽度
     static constexpr qreal HEALTH_BAR_HEIGHT = 20.0;   // 血条高度
+    // 【新增】游戏结束状态和UI
+    bool m_isGameOver{false};               // 游戏是否结束的状态标志
+    QGraphicsTextItem* m_gameOverText{nullptr}; // 用于显示 "Game Over" 或胜利信息的文本项
 };
 
 #endif //QT_PROGRAMMING_2024_BATTLESCENE_H

@@ -66,6 +66,15 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     fpsTextItem->setZValue(103); // 确保在血条之上
     addItem(fpsTextItem);
 
+    // 【新增】初始化游戏结束文本
+    m_gameOverText = new QGraphicsTextItem();
+    m_gameOverText->setFont(QFont("Arial", 48, QFont::Bold));
+    m_gameOverText->setDefaultTextColor(Qt::red);
+    m_gameOverText->setZValue(105); // 确保在所有UI之上
+    m_gameOverText->setVisible(false); // 初始时隐藏
+    addItem(m_gameOverText);
+
+
     // 启动FPS计时器
     fpsTimer.start();
 }
@@ -566,6 +575,20 @@ void BattleScene::updateFallingArmors() {
 
 
 void BattleScene::update() {
+    // 【核心修改】在所有逻辑开始前检查游戏是否结束
+    if (m_isGameOver) {
+        return; // 如果游戏已结束，则停止所有更新
+    }
+
+    // 【核心修改】检查胜利/失败条件
+    if (character && character->isDead()) {
+        showGameOverScreen("Enemy Wins!");
+        return; // 立即返回，本帧不再处理其他逻辑
+    }
+    if (enemy && enemy->isDead()) {
+        showGameOverScreen("Player 1 Wins!");
+        return; // 立即返回，本帧不再处理其他逻辑
+    }
     // 【新增】FPS计算和显示逻辑
     frameCount++;
     // 每隔大约1秒更新一次FPS文本
@@ -1116,4 +1139,27 @@ void BattleScene::processProjectiles() {
         
         ++it;
     }
+}
+
+// 【新增】游戏结束时显示胜利信息的函数
+void BattleScene::showGameOverScreen(const QString &winnerName) {
+    if (m_isGameOver) {
+        return; // 防止重复调用
+    }
+
+    m_isGameOver = true; // 标记游戏已结束
+
+    // 设置文本内容
+    m_gameOverText->setPlainText(winnerName);
+
+    // 将文本居中显示
+    QRectF textRect = m_gameOverText->boundingRect();
+    qreal x = (sceneRect().width() - textRect.width()) / 2.0;
+    qreal y = (sceneRect().height() - textRect.height()) / 2.0;
+    m_gameOverText->setPos(x, y);
+
+    // 显示文本
+    m_gameOverText->setVisible(true);
+
+    qDebug() << "Game Over." << winnerName;
 }
