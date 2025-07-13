@@ -668,11 +668,24 @@ void BattleScene::processDeletions() {
     }
 
     // 现在，安全地在另一个循环中删除所有被标记的物品
+#include <QTimer> // 确保包含了这个头文件
+
+    // ... 在你的函数中 ...
     for (QGraphicsItem* item : itemsToDelete) {
-        qDebug() << "Cleaning up marked item.";
+        qDebug() << "Marking item for cleanup:" << item;
+
+        // 1. 立即从场景中移除，这样场景就不会再渲染或与它交互
         removeItem(item);
-        delete item;
+
+        // 2. 使用单次触发的定时器来安全地延迟删除
+        //    这会将 `delete item;` 推迟到事件循环的下一个迭代中执行
+        QTimer::singleShot(0, [item]() {
+            qDebug() << "Actually deleting item:" << item;
+            delete item;
+        });
     }
+    // 清空列表，因为它现在只包含悬空指针或即将被删除的对象的指针
+    itemsToDelete.clear();
 }
 
 // 新增：创建随机武器
