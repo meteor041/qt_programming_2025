@@ -1117,26 +1117,35 @@ void BattleScene::processProjectiles() {
     auto it = projectiles.begin();
     while (it != projectiles.end()) {
         ShotPutProjectile* projectile = *it;
-        
+
         // 检查投掷物是否仍然有效
-        if (!projectile) {
+        if (!projectile || projectile->scene() != this){
             // 投掷物已被删除或不在当前场景中，从列表中移除
             it = projectiles.erase(it);
             continue;
         }
-         // 检查是否标记为删除
+
+        // 检查是否标记为删除
         if (projectile->isMarkedForDeletion()) {
-            removeItem(projectile);
+            // 先从场景中移除
+            if (projectile->scene() == this) {
+                removeItem(projectile);
+            }
+
+            // 然后删除对象
             delete projectile;
+
+            // 从列表中移除
             it = projectiles.erase(it);
             continue;
         }
+
         // 更新投掷物位置
         projectile->updatePosition();
-        
+
         // 检查碰撞
         projectile->checkCollision();
-        
+
         ++it;
     }
 }

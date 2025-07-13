@@ -115,6 +115,8 @@ Character::Character(QGraphicsItem *parent)
     adrenalineHealCounter = 0;
 }
 
+
+
 QRectF Character::boundingRect() const {
     // 返回我们自己管理的、可见的图形项的边界
     if (characterPixmapItem) {
@@ -386,7 +388,6 @@ void Character::setWeapon(Weapon* newWeapon) {
     }
     weapon = newWeapon;
 }
-
 // 在现有的武器相关方法后添加以下实现
 
 void Character::performAttack() {

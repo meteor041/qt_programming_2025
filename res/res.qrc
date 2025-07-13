@@ -31,8 +31,9 @@
         <file>Biker_hit1.png</file>
         <file>Biker_hit2.png</file>
         <file>ChainmailArmor.png</file>
-        <file>BulletproofVest.png</file>
-
-
+        <file>sniperrifle.png</file>
+        <file>rifle.png</file>
+        <file>bullet1.png</file>
+        <file>bullet2.png</file>
     </qresource>
 </RCC>
