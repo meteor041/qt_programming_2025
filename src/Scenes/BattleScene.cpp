@@ -8,6 +8,7 @@
 #include "../Items/Armors/ChainmailArmor.h"
 #include "../Items/Maps/platform/Platform.h" // 包含平台基类
 #include "../Items/Weapon/ShotPut.h" // 包含投掷物类
+#include "../Items/Weapon/Bullet.h"
 
 // 构造函数：初始化整个战斗场景
 BattleScene::BattleScene(QObject *parent) : Scene(parent) {
@@ -427,40 +428,38 @@ void BattleScene::keyReleaseEvent(QKeyEvent *event) {
 // 【新增】处理单个角色攻击的辅助函数
 void BattleScene::processCharacterCombat(Character* attacker, Character* target, bool& attackFlag) {
     if (!attacker || !target || !attackFlag || attacker->isDead()) {
-        // qDebug() << "processCharacterCombat: Invalid parameters or attacker is dead";
         return;
     }
 
-    // 检查目标是否在攻击范围内
     Weapon* weapon = attacker->getWeapon();
     if (!weapon) {
         qDebug() << "No weapon equipped!";
         return;
     }
-    // 根据武器类型执行不同的攻击逻辑
-    if (dynamic_cast<Fist*>(weapon) || dynamic_cast<Knife*>(weapon)) {
-        if (isInAttackRange(attacker, target, attacker->getWeaponAttackRange())) {
-            // 执行攻击动画/效果
+
+    // --- 修改后的逻辑 ---
+    WeaponType type = weapon->getWeaponType();
+
+    if (type == WeaponType::Fist || type == WeaponType::Knife) {
+        // 这是近战武器，需要检查攻击范围
+        if (isInAttackRange(attacker, target, weapon->getAttackRange())) {
             attacker->performAttack();
-
-            // 从武器获取伤害值
-            int damage = attacker->getWeapon()->getAttackPower();
+            int damage = weapon->getAttackPower();
             target->takeDamage(damage, weapon);
-
-            qDebug() << "Character attacked Character"
-                    << "for" << damage << "damage! Target health:" << target->getHealth();
+            qDebug() << "Melee attack hit for" << damage << "damage!";
         } else {
-            qDebug() << "Character tried to attack, but target is too far!";
+            // 在范围外，可以播一个挥空的动画，但不开火
+            qDebug() << "Melee attack missed, target out of range.";
         }
-    } else if (dynamic_cast<ShotPut*>(weapon)) {
-        // ShotPut 只执行 performAttack
+    } else if (type == WeaponType::Rifle || type == WeaponType::SniperRifle || type == WeaponType::ShotPut) {
+        // 这是远程/投掷武器，不需要检查范围，直接让武器自己处理攻击逻辑
         attacker->performAttack();
+        // 伤害和子弹创建由武器的 attack() 方法内部处理
     }
+
     // 重置攻击状态，实现单次按下、单次攻击
     attackFlag = false;
 }
-
-// BattleScene.cpp
 
 // 【改动】重构战斗处理函数，使其对称并可复用
 void BattleScene::processCombat() {
@@ -613,6 +612,8 @@ void BattleScene::update() {
     processProjectiles();
     // 【新增】添加护甲掉落处理
     processArmorDrop();
+    // 【新增】在帧末尾调用清理函数
+    processDeletions();
     // 【新增】更新护甲UI
     updateArmorDisplays();
     // 更新血条UI
@@ -652,31 +653,68 @@ void BattleScene::processWeaponDrop() {
     updateFallingWeapons();
 }
 
+// 在 BattleScene.h 的 private 部分添加声明:
+// void processDeletions();
+
+// 在 BattleScene.cpp 中实现:
+void BattleScene::processDeletions() {
+    // 创建一个列表来存储待删除的物品
+    QList<QGraphicsItem*> itemsToDelete;
+
+    // 遍历场景中的所有物品
+    for (QGraphicsItem* item : items()) {
+        // 检查是否是子弹
+        if (auto* bullet = dynamic_cast<Bullet*>(item)) {
+            if (bullet->isMarkedForDeletion()) {
+                itemsToDelete.append(bullet);
+            }
+        }
+        // 检查是否是实心球投掷物 (复用这个清理函数)
+        else if (auto* shotput = dynamic_cast<ShotPutProjectile*>(item)) {
+            if (shotput->isMarkedForDeletion()) {
+                itemsToDelete.append(shotput);
+            }
+        }
+        // 未来还可以添加其他需要延迟删除的物品...
+    }
+
+    // 现在，安全地在另一个循环中删除所有被标记的物品
+    for (QGraphicsItem* item : itemsToDelete) {
+        qDebug() << "Cleaning up marked item.";
+        removeItem(item);
+        delete item;
+    }
+}
+
 // 新增：创建随机武器
 // 在 createRandomWeapon() 函数中修改
 Weapon* BattleScene::createRandomWeapon() {
-    // 随机选择武器类型（现在包括实心球）
-    int weaponType = QRandomGenerator::global()->bounded(2);  // 0-2，对应Fist、Knife、ShotPut
-    
+    // 随机数范围扩大，以包含新武器
+    int weaponType = QRandomGenerator::global()->bounded(4);  // 0-3
+
     Weapon* weapon = nullptr;
     switch (weaponType) {
-        // case 0:
-        //     weapon = new Fist();
-        //     qDebug() << "Created Fist weapon";
-        //     break;
-        case 0:
-            weapon = new Knife();
-            qDebug() << "Created Knife weapon";
-            break;
-        case 1:
-            weapon = new ShotPut(nullptr, 3); // 3次投掷
-            qDebug() << "Created ShotPut weapon";
-            break;
-        default:
-            weapon = new Fist();
-            break;
+    case 0:
+        weapon = new Knife();
+        qDebug() << "Created Knife weapon";
+        break;
+    case 1:
+        weapon = new ShotPut(nullptr, 3);
+        qDebug() << "Created ShotPut weapon";
+        break;
+    case 2: // <-- 新增
+        weapon = new Rifle();
+        qDebug() << "Created Rifle weapon";
+        break;
+    case 3: // <-- 新增
+        weapon = new SniperRifle();
+        qDebug() << "Created SniperRifle weapon";
+        break;
+    default:
+        weapon = new Knife(); // 默认武器
+        break;
     }
-    
+
     return weapon;
 }
 

@@ -80,13 +80,23 @@ void ShotPut::throwShotPut(Character *attacker) {
     battleScene->addProjectile(projectile);
     
     // 如果用完所有投掷次数，移除武器
+    // ShotPut.cpp, line ~52
     if (!canThrow()) {
         qDebug() << "ShotPut depleted, removing weapon";
-        // QTimer::singleShot(100, [attacker]() {
-            // 创建新的Fist武器替换当前武器
-            Fist* defaultWeapon = new Fist();
-            attacker->setWeapon(defaultWeapon);
-        // });
+
+        // 1. 切换到新武器
+        attacker->setWeapon(new Fist(attacker)); // 建议给Fist也传递parent
+
+        // 2. 从场景中移除自己（如果自己的图标在场景中）
+        if (this->scene()) {
+            this->scene()->removeItem(this);
+        }
+
+        // 3. 删除自己
+        delete this;
+
+        // 4. 【重要】在调用 delete this 之后立即返回，不要再执行任何代码
+        return;
     }
 }
 

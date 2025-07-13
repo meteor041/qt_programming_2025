@@ -24,6 +24,7 @@ void Scene::update() {
     processPhysics();
 
     processPicking();
+    this -> advance();
 }
 
 void Scene::startLoop() {

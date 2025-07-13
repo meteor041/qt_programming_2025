@@ -23,6 +23,8 @@
 #include <QElapsedTimer>
 #include "../Items/Armors/ChainmailArmor.h"
 #include "../Items/Armors/BulletproofVest.h"
+#include "../Items/Weapon/Rifle.h"
+#include "../Items/Weapon/SniperRifle.h"
 
 class BattleScene : public Scene {
     Q_OBJECT
@@ -49,6 +51,8 @@ public:
 
     // 【新增】护甲掉落处理函数
     void processArmorDrop();
+
+    void processDeletions();
 
 protected slots:
     void update() override;
