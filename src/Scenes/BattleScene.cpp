@@ -36,22 +36,6 @@ BattleScene::BattleScene(QObject *parent) : Scene(parent) {
     enemy->setZValue(10);
     // 将玩家2放置在场景右侧，与玩家1对称
     enemy->setPos(sceneRect().width() - spawnPos.x() - enemy->boundingRect().width(), spawnPos.y());
-    // 【改动】使用局部变量创建初始盔甲，不再使用成员变量 spareArmor
-    Armor* initialArmor = new ChainmailArmor(); // 或者 new BulletproofVest();
-    addItem(initialArmor);
-    initialArmor->unmount();
-
-    // 将盔甲放置在场景中央的平台上
-    QPointF armorTargetPos(sceneRect().center().x() + 200, 0); // 设定一个目标水平位置
-    Platform* groundForArmor = map->getGroundPlatform(armorTargetPos, initialArmor->boundingRect().height());
-    if (groundForArmor) {
-        // 如果找到了平台，将盔甲放在平台表面上方
-        initialArmor->setPos(armorTargetPos.x(),
-                             groundForArmor->getSurfaceY() - initialArmor->boundingRect().height());
-    } else {
-        // 如果没找到平台（作为备用方案），放在一个安全的位置
-        initialArmor->setPos(sceneRect().center());
-    }
     
     // 初始化血条UI
     initHealthBars();

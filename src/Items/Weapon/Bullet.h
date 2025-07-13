@@ -4,10 +4,11 @@
 #include "../Item.h"
 
 class Character; // 前向声明
+class Weapon;
 
 class Bullet : public Item {
 public:
-    explicit Bullet(Character* owner, int damage, qreal speed, QGraphicsItem* parent = nullptr);
+    explicit Bullet(Character* owner, Weapon* sourceWeapon, int damage, qreal speed, QGraphicsItem* parent = nullptr);
 
     // 每一帧更新子弹位置
     void advance(int phase) override;
@@ -29,6 +30,7 @@ private:
     Character* owner;      // 发射这颗子弹的角色，防止伤害到自己
     int damage;            // 子弹伤害
     qreal speed;           // 子弹飞行速度
+    Weapon* sourceWeapon; // <-- 【新增】成员变量
     QPointF velocity;      // 子弹的速度向量
     bool markedForDeletion; // 【新增】添加一个布尔标记
 };

@@ -48,7 +48,8 @@ void Rifle::attack(Character *attacker) {
     if (attacker && attacker->scene()) {
         // 创建子弹实例
         // 参数: owner, damage, speed
-        Bullet* bullet = new Bullet(attacker, this->getAttackPower(), 25.0);
+        // 【核心修正】创建子弹时，把 this (指向当前这把 Rifle 的指针) 传进去
+        Bullet* bullet = new Bullet(attacker, this, this->getAttackPower(), 25.0);
 
         // 设置子弹的初始位置 (例如，在角色的中心)
         bullet->setPos(attacker->scenePos() + attacker->boundingRect().center());

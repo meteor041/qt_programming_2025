@@ -1,12 +1,13 @@
 #include "Bullet.h"
 #include "../Characters/Character.h"
 #include "../../Scenes/BattleScene.h"
+#include "../Weapon/Weapon.h" // <-- 【新增】包含完整的
 #include <QGraphicsScene>
 #include <QList>
 #include <QDebug>
 
-Bullet::Bullet(Character* owner, int damage, qreal speed, QGraphicsItem* parent)
-    : Item(parent, ":/bullet1.png"), owner(owner), damage(damage), speed(speed), markedForDeletion(false) // <-- 初始化
+Bullet::Bullet(Character* owner, Weapon* sourceWeapon, int damage, qreal speed, QGraphicsItem* parent)
+    : Item(parent, ":/bullet1.png"), owner(owner), sourceWeapon(sourceWeapon),damage(damage), speed(speed), markedForDeletion(false) // <-- 初始化
 {
     // 根据发射者的朝向决定子弹的初始速度方向
     if (owner->isFacingRight()) {
@@ -47,8 +48,8 @@ void Bullet::checkCollision() {
         if (auto* target = dynamic_cast<Character*>(item)) {
             if (target != owner && !target->isDead()) {
                 qDebug() << "Bullet hit a character! Marking for deletion.";
-                target->takeDamage(this->damage, nullptr);
-
+                // 【核心修正】将存储的 sourceWeapon 指针传递过去！
+                target->takeDamage(this->damage, this->sourceWeapon);
                 // 【修改！】不再直接删除，而是打上标记
                 markedForDeletion = true;
 

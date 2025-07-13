@@ -32,7 +32,7 @@ void SniperRifle::attack(Character *attacker) {
 
     if (attacker && attacker->scene()) {
         // 狙击枪子弹速度更快
-        Bullet* bullet = new Bullet(attacker, this->getAttackPower(), 40.0);
+        Bullet* bullet = new Bullet(attacker, this,this->getAttackPower(), 40.0);
         bullet->setPos(attacker->scenePos() + attacker->boundingRect().center());
         attacker->scene()->addItem(bullet);
     }
