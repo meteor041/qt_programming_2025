@@ -19,11 +19,8 @@ ShotPut::ShotPut(QGraphicsItem *parent, int throwCount)
         pixmapItem = new QGraphicsPixmapItem(this);
     }
     if (pixmapItem) {
-        // 创建一个简单的圆形图片代表实心球
-        QPixmap shotPutPixmap(20, 20);
-        shotPutPixmap.fill(Qt::magenta);
-        pixmapItem->setPixmap(shotPutPixmap);
-        pixmapItem->setPos(25, -5);
+        pixmapItem->setPixmap(QPixmap(":/shotput.png"));
+        pixmapItem->setPos(30, -10);
     }
     
     qDebug() << "ShotPut created with" << maxThrows << "throws";
