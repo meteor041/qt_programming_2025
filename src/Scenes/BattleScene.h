@@ -25,6 +25,7 @@
 #include "../Items/Armors/BulletproofVest.h"
 #include "../Items/Weapon/Rifle.h"
 #include "../Items/Weapon/SniperRifle.h"
+#include "../Items/Weapon/ShotPut.h"
 
 class BattleScene : public Scene {
     Q_OBJECT
@@ -43,9 +44,6 @@ public:
     // 新增：武器掉落处理函数
     void processWeaponDrop();
 
-    void addProjectile(ShotPutProjectile* projectile);
-    
-    void processProjectiles();
     // 新增：消耗品掉落处理函数
     void processConsumableDrop();
 
@@ -121,9 +119,7 @@ private:
     QList<Consumable*> fallingConsumables;  // 正在下落的消耗品列表
     static constexpr qreal CONSUMABLE_FALL_SPEED = 10.0;  // 消耗品下落速度
     
-    // 新增：投掷物管理相关成员变量
-    QList<ShotPutProjectile*> projectiles;  // 活跃的投掷物列表
-    
+
     // 【新增】护甲掉落相关成员变量
     int armorDropFrameCounter{0};
     static const int ARMOR_DROP_INTERVAL = 1200; // 1200帧 ≈ 20秒

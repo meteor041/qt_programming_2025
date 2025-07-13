@@ -77,6 +77,8 @@ add_executable(qt_programming_2024 src/main.cpp
         src/Items/Weapon/Rifle.cpp
         src/Items/Weapon/SniperRifle.h
         src/Items/Weapon/SniperRifle.cpp
+        src/Items/Weapon/ShotPutProjectile.h
+        src/Items/Weapon/ShotPutProjectile.cpp
 
 )
 target_link_libraries(qt_programming_2024

@@ -8,6 +8,7 @@
 #include "../Items/Armors/ChainmailArmor.h"
 #include "../Items/Maps/platform/Platform.h" // 包含平台基类
 #include "../Items/Weapon/ShotPut.h" // 包含投掷物类
+#include "../Items/Weapon/ShotPutProjectile.h"
 #include "../Items/Weapon/Bullet.h"
 
 // 构造函数：初始化整个战斗场景
@@ -592,8 +593,6 @@ void BattleScene::update() {
     processWeaponDrop();
     // 添加消耗品掉落处理
     processConsumableDrop();
-    // 添加投掷物处理
-    processProjectiles();
     // 【新增】添加护甲掉落处理
     processArmorDrop();
     // 【新增】在帧末尾调用清理函数
@@ -653,10 +652,16 @@ void BattleScene::processDeletions() {
                 itemsToDelete.append(bullet);
             }
         }
-        // 检查是否是实心球投掷物 (复用这个清理函数)
+        // 【新增】检查是否是实心球投掷物
         else if (auto* shotput = dynamic_cast<ShotPutProjectile*>(item)) {
             if (shotput->isMarkedForDeletion()) {
                 itemsToDelete.append(shotput);
+            }
+        }
+        // 【新增】检查是否是用完的实心球武器
+        else if (auto* shotputWeapon = dynamic_cast<ShotPut*>(item)) {
+            if (shotputWeapon->isMarkedForDeletion()) {
+                itemsToDelete.append(shotputWeapon);
             }
         }
         // 未来还可以添加其他需要延迟删除的物品...
@@ -673,8 +678,8 @@ void BattleScene::processDeletions() {
 // 新增：创建随机武器
 // 在 createRandomWeapon() 函数中修改
 Weapon* BattleScene::createRandomWeapon() {
-    // 随机数范围扩大，以包含新武器
-    int weaponType = QRandomGenerator::global()->bounded(4);  // 0-3
+    // 之前你的随机数可能是 bounded(4)，现在需要根据武器总数调整
+    int weaponType = QRandomGenerator::global()->bounded(4);  // 假设现在总共有4种武器: Knife, Rifle, SniperRifle, ShotPut
 
     Weapon* weapon = nullptr;
     switch (weaponType) {
@@ -683,25 +688,24 @@ Weapon* BattleScene::createRandomWeapon() {
         qDebug() << "Created Knife weapon";
         break;
     case 1:
-        weapon = new ShotPut(nullptr, 3);
-        qDebug() << "Created ShotPut weapon";
-        break;
-    case 2: // <-- 新增
         weapon = new Rifle();
         qDebug() << "Created Rifle weapon";
         break;
-    case 3: // <-- 新增
+    case 2:
         weapon = new SniperRifle();
         qDebug() << "Created SniperRifle weapon";
         break;
+    case 3: // <-- 新增
+        weapon = new ShotPut(nullptr, 3); // 默认3次使用机会
+        qDebug() << "Created ShotPut weapon";
+        break;
     default:
-        weapon = new Knife(); // 默认武器
+        weapon = new Knife();
         break;
     }
 
     return weapon;
 }
-
 // 新增：更新正在下落的武器
 void BattleScene::updateFallingWeapons() {
     // 使用迭代器遍历，以便安全地删除元素
@@ -1125,43 +1129,6 @@ void BattleScene::updateFallingConsumables() {
     }
 }
 
-// 新增：添加投掷物到管理列表
-void BattleScene::addProjectile(ShotPutProjectile* projectile) {
-    if (projectile) {
-        projectiles.append(projectile);
-        qDebug() << "Added projectile to BattleScene management, total:" << projectiles.size();
-    }
-}
-
-// 新增：处理所有投掷物的更新和碰撞检测
-void BattleScene::processProjectiles() {
-    // 使用迭代器遍历，以便安全地删除元素
-    auto it = projectiles.begin();
-    while (it != projectiles.end()) {
-        ShotPutProjectile* projectile = *it;
-        
-        // 检查投掷物是否仍然有效
-        if (!projectile) {
-            // 投掷物已被删除或不在当前场景中，从列表中移除
-            it = projectiles.erase(it);
-            continue;
-        }
-         // 检查是否标记为删除
-        if (projectile->isMarkedForDeletion()) {
-            removeItem(projectile);
-            delete projectile;
-            it = projectiles.erase(it);
-            continue;
-        }
-        // 更新投掷物位置
-        projectile->updatePosition();
-        
-        // 检查碰撞
-        projectile->checkCollision();
-        
-        ++it;
-    }
-}
 
 // 【新增】游戏结束时显示胜利信息的函数
 void BattleScene::showGameOverScreen(const QString &winnerName) {
