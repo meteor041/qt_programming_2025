@@ -38,11 +38,18 @@ public:
     // 检查护甲是否已损坏
     [[nodiscard]] bool isBroken() const;
 
+    // 检查护甲是否因损坏而被标记删除
+    [[nodiscard]] bool isMarkedForDeletion() const;
+
 protected:
     // --- 【新增】耐久度相关保护成员变量 ---
     int m_durability{100};      // 当前耐久度
     int m_maxDurability{100};   // 最大耐久度
     bool m_isBroken{false};     // 护甲是否已损坏
+    // --- 【新增】内部使用的标记方法 ---
+    void markForDeletion();
+    // --- 【新增】删除标记 ---
+    bool m_markedForDeletion{false}; // 默认不标记
 };
 
 

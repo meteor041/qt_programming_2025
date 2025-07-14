@@ -231,7 +231,7 @@ void Character::updateAppearanceAndState() {
         }
 
         // 如果仍在受击状态，则直接返回，不执行下面的任何逻辑
-        if (m_isInStealth) this->setOpacity(0.4); else this->setOpacity(1.0);
+        if (m_isInStealth) this->setOpacity(0.01); else this->setOpacity(1.0);
         return;
     }
 
@@ -256,7 +256,7 @@ void Character::updateAppearanceAndState() {
         }
         // 如果正在播放一次性动画，直接返回
         if (currentState == Attacking) {
-            if (m_isInStealth) this->setOpacity(0.4); else this->setOpacity(1.0);
+            if (m_isInStealth) this->setOpacity(0.01); else this->setOpacity(1.0);
             return;
         }
     }
@@ -328,7 +328,7 @@ void Character::updateAppearanceAndState() {
 
     // 透明度效果
     if (m_isInStealth) {
-        this->setOpacity(0.4);
+        this->setOpacity(0.01);
     } else {
         this->setOpacity(1.0);
     }
@@ -339,22 +339,33 @@ bool Character::isPicking() const {
     return picking;
 }
 
-Armor *Character::pickupArmor(Armor *newArmor) {
-    Armor *oldArmor = armor;
-    if (oldArmor != nullptr) {
+// 【修改】pickupArmor函数，使其更健壮
+Armor* Character::pickupArmor(Armor* newArmor) {
+    // newArmor 不可能为 null，因为这是由 findNearest... 找到的
+    if (!newArmor) return nullptr;
+
+    Armor* oldArmor = armor; // 先把旧护甲的指针存起来
+
+    // --- 装备新护甲 ---
+    armor = newArmor; // Character 的指针指向新护甲
+    armor->setParentItem(this); // 新护甲成为 Character 的子项（用于位置跟随）
+    armor->mountToParent();     // 执行装备逻辑（如隐藏图片）
+    qDebug() << "Character equipped" << armor->getName();
+
+    // --- 处理被替换下来的旧护甲 ---
+    if (oldArmor) {
+        // 如果旧护甲存在，卸下它
+        // 卸下后，它就不再是 Character 的子项了，可以被丢在地上
         oldArmor->unmount();
-        // 将旧护甲放在新护甲原来的位置
-        if(newArmor) {
-            oldArmor->setPos(newArmor->pos());
-        }
-        oldArmor->setParentItem(parentItem());
+
+        // 旧护甲不应该再被返回或操作，因为它要么完好地被丢在地上，
+        // 要么已经损坏并等待删除。BattleScene 的拾取逻辑已经处理完 newArmor，
+        // oldArmor 的状态由它自己和 BattleScene 的清理系统管理。
+        // 这里返回 oldArmor 主要是为了让 BattleScene 能把它丢在地上。
+        return oldArmor;
     }
-    if (newArmor != nullptr) {
-        newArmor->setParentItem(this);
-        newArmor->mountToParent();
-    }
-    armor = newArmor;
-    return oldArmor; // 返回旧护甲，场景可以继续管理它
+
+    return nullptr; // 如果之前没有护甲，就返回 nullptr
 }
 
 // 武器相关方法实现
@@ -394,6 +405,14 @@ void Character::performAttack() {
     if (currentState == Attacking || currentState == Hit) {
         return;
     }
+
+    // 【！！！关键修复！！！】
+    // 如果是从下蹲状态发起攻击，必须先恢复站立高度，否则会陷入地面！
+    if (currentState == Crouching) {
+        setY(y() - (standingHeight - crouchingHeight));
+        crouching = false; // 确保下蹲的内部状态也被重置
+    }
+
 
     // 触发攻击动画
     if (!attackingAnimationFrames.isEmpty()) {
@@ -463,24 +482,22 @@ void Character::takeDamage(int damage, Weapon* sourceWeapon) {
 
     int finalDamage = damage;
 
-    // 如果装备了护甲，则先由护甲处理伤害
-    if (armor != nullptr) {
+    // 【核心修改】
+    // 只有当护甲存在 且 它尚未被标记为待删除时，才使用它来处理伤害。
+    // 只有当护甲存在且未损坏时，才用它处理伤害
+    if (armor != nullptr && !armor->isBroken()) {
         qDebug() << "Armor is processing damage...";
         finalDamage = armor->processDamage(damage, sourceWeapon);
 
-        // 检查护甲是否在此次伤害后损坏
+        // --- 【！！！最终修复！！！】 ---
+        // 在护甲处理完伤害后，立刻检查它是否因此次攻击而损坏。
+        // 如果损坏了，Character 必须立即忘记它，将指针设为 nullptr。
+        // 这是防止悬空指针的关键一步。
         if (armor->isBroken()) {
-            qDebug() << "Armor broke and is being removed.";
-            // 从场景中移除并删除护甲对象
-            // 注意：直接删除可能会有问题，更好的做法是标记它，
-            // 然后在场景的主循环中安全地删除。
-            // 但为简化，我们先直接处理。
-            if(this->scene()){
-                this->scene()->removeItem(armor);
-            }
-            delete armor;
-            armor = nullptr;
+            qDebug() << "Character's armor broke! Nullifying the armor pointer.";
+            armor = nullptr; // <--- 这就是解决问题的核心代码！
         }
+        // --- 修复结束 ---
     }
 
     // 如果仍有伤害，触发受击动画

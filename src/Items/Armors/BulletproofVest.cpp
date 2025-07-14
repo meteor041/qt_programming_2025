@@ -33,6 +33,9 @@ int BulletproofVest::processDamage(int incomingDamage, Weapon *sourceWeapon) {
             // 如果耐久度耗尽，剩余的伤害也应由玩家承受
             damageToPlayer += -m_durability;
             m_durability = 0;
+            // 不再直接删除，而是调用基类的标记方法
+            this->markForDeletion();
+            // --- 修改结束 ---
         }
 
         return damageToPlayer;

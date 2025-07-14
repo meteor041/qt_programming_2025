@@ -52,7 +52,7 @@ void Rifle::attack(Character *attacker) {
         Bullet* bullet = new Bullet(attacker, this, this->getAttackPower(), 25.0);
 
         // 设置子弹的初始位置 (例如，在角色的中心)
-        bullet->setPos(attacker->scenePos() + attacker->boundingRect().center());
+        bullet->setPos(attacker->scenePos() + attacker->boundingRect().center()+QPointF(0, -10));
 
         // 将子弹添加到场景中
         attacker->scene()->addItem(bullet);

@@ -216,7 +216,7 @@ void BattleScene::processCharacterMovement(Character* aCharacter) {
 
             // 3. 左右侧碰撞检测（新增）
             if (verticalOverlap) {
-                // qDebug() << "vertical overlap"; // 如果需要调试，可以取消此行注释
+                 qDebug() << "vertical overlap"; // 如果需要调试，可以取消此行注释
                 // 左侧碰撞检测（角色从左侧撞到平台）
                 if (aCharacter->getVelocity().x() > 0) { // 角色正在向右移动
                     qreal currentRight = currentCharRect.right();
@@ -241,8 +241,10 @@ void BattleScene::processCharacterMovement(Character* aCharacter) {
 
                     // 检查是否从平台右侧穿过平台右边界
                     if (currentLeft >= platformRight && newLeft < platformRight) {
+                        qDebug() << "vertical conflict";
                         // 将角色位置限制在平台右侧
                         newPos.setX(platformRight);
+                        qDebug() << "set x";
                         // 反转X轴速度
                         aCharacter->setVelocity(QPointF(-aCharacter->getVelocity().x(), aCharacter->getVelocity().y()));
                         break; // 找到碰撞就停止检查其他平台
@@ -251,7 +253,7 @@ void BattleScene::processCharacterMovement(Character* aCharacter) {
             }
         }
     }
-
+//？为什么会出现跳跃时穿过的情况
     // 修改Y轴限制：不允许进入画面最下方120像素的区域
     newPos.setY(qBound(0.0, newPos.y(), bounds.height() - charRect.height() - 120.0));
     aCharacter->setPos(newPos);
@@ -664,6 +666,12 @@ void BattleScene::processDeletions() {
                 itemsToDelete.append(shotputWeapon);
             }
         }
+        // --- 【新增】检查损坏的护甲 ---
+        else if (auto* armor = dynamic_cast<Armor*>(item)) {
+            if (armor->isMarkedForDeletion()) {
+                itemsToDelete.append(armor);
+            }
+        }
         // 未来还可以添加其他需要延迟删除的物品...
     }
 
@@ -795,7 +803,7 @@ void BattleScene::initHealthBars() {
     addItem(characterHealthText);
 
     // 敌人血条（右上角）
-    qreal enemyBarX = sceneRect().width() - HEALTH_BAR_WIDTH - 20;
+    qreal enemyBarX = sceneRect().width() - HEALTH_BAR_WIDTH - 70;
     qreal enemyBarY = 20;
 
     // 敌人血条背景
@@ -885,7 +893,7 @@ void BattleScene::initArmorDisplays() {
     // 敌人护甲文本 (右侧，血条下方)
     enemyArmorText = new QGraphicsTextItem();
     // 定位在血量文字下方
-    enemyArmorText->setPos(sceneRect().width() - HEALTH_BAR_WIDTH - 20, 20 + HEALTH_BAR_HEIGHT + 25);
+    enemyArmorText->setPos(sceneRect().width() - HEALTH_BAR_WIDTH - 70, 20 + HEALTH_BAR_HEIGHT + 25);
     enemyArmorText->setDefaultTextColor(Qt::cyan);
     enemyArmorText->setFont(QFont("Arial", 12, QFont::Bold));
     enemyArmorText->setZValue(102);
