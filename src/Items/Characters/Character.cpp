@@ -477,7 +477,7 @@ void Character::setHealth(int health) {
 }
 
 // 【修改】takeDamage函数以处理护甲逻辑
-void Character::takeDamage(int damage, Weapon* sourceWeapon) {
+void Character::takeDamage(int damage, WeaponType sourceType) {
     if (dead) return;
 
     int finalDamage = damage;
@@ -487,7 +487,7 @@ void Character::takeDamage(int damage, Weapon* sourceWeapon) {
     // 只有当护甲存在且未损坏时，才用它处理伤害
     if (armor != nullptr && !armor->isBroken()) {
         qDebug() << "Armor is processing damage...";
-        finalDamage = armor->processDamage(damage, sourceWeapon);
+        finalDamage = armor->processDamage(damage, sourceType);
 
         // --- 【！！！最终修复！！！】 ---
         // 在护甲处理完伤害后，立刻检查它是否因此次攻击而损坏。

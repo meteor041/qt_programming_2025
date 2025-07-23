@@ -7,7 +7,7 @@
 #include <QDebug>
 
 Rifle::Rifle(QGraphicsItem *parent)
-    : Weapon(parent, "10"), ammo(30) // 假设攻击力10，弹药30
+    : Weapon(parent, "10"), ammo(30),m_markedForDeletion(false) // 【新增】初始化标记 // 假设攻击力10，弹药30
 {
     // Weapon构造函数第一个参数是parent, 第二个是攻击力
     // 设置贴图
@@ -49,7 +49,7 @@ void Rifle::attack(Character *attacker) {
         // 创建子弹实例
         // 参数: owner, damage, speed
         // 【核心修正】创建子弹时，把 this (指向当前这把 Rifle 的指针) 传进去
-        Bullet* bullet = new Bullet(attacker, this, this->getAttackPower(), 25.0);
+        Bullet* bullet = new Bullet(attacker, this->getAttackPower(), this->getWeaponType(), 25.0);
 
         // 设置子弹的初始位置 (例如，在角色的中心)
         bullet->setPos(attacker->scenePos() + attacker->boundingRect().center()+QPointF(0, -10));
@@ -64,12 +64,21 @@ void Rifle::attack(Character *attacker) {
         // 卸载自己，并让角色换上拳头
         attacker->setWeapon(new Fist(attacker)); // 角色自动装备拳头
 
-        // 从场景中移除武器图标并删除自己
-        // 注意：这里直接delete this可能会引发问题，更好的方式是标记并由场景在下一帧删除。
-        // 但为简化，我们先这样做。
-        if (this->scene()) {
-            this->scene()->removeItem(this);
-        }
-        delete this;
+        // 【核心修改】标记自己等待被 BattleScene 清理，而不是直接删除
+        this->markForDeletion();
+    }
+}
+
+// 【新增】实现标记和检查方法 (仿照 ShotPut)
+bool Rifle::isMarkedForDeletion() const {
+    return m_markedForDeletion;
+}
+
+void Rifle::markForDeletion() {
+    m_markedForDeletion = true;
+    // 隐藏武器图标，因为它即将被删除
+    if (this->scene()) {
+        // 这一步是可选的，但可以立即提供视觉反馈
+        // BattleScene 的 processDeletions 最终会处理真正的移除和删除
     }
 }

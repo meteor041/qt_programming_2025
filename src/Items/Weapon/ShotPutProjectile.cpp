@@ -51,7 +51,7 @@ void ShotPutProjectile::checkCollision() {
             // 如果击中了非自己且存活的角色
             if (target != owner && !target->isDead()) {
                 qDebug() << "ShotPutProjectile hit a character! Marking for deletion.";
-                target->takeDamage(this->damage, this->sourceWeapon);
+                target->takeDamage(this->damage, this->sourceWeapon->getWeaponType());
                 markedForDeletion = true;
                 return; // 命中后立即返回
             }

@@ -11,7 +11,7 @@ public:
 
     [[nodiscard]] QString getName() const override;
     // 实现伤害处理逻辑
-    int processDamage(int incomingDamage, Weapon* sourceWeapon) override;
+    int processDamage(int incomingDamage, WeaponType sourceType) override;
 };
 
 #endif //QT_PROGRAMMING_2024_CHAINMAILARMOR_H

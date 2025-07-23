@@ -432,7 +432,7 @@ void BattleScene::processCharacterCombat(Character* attacker, Character* target,
         if (isInAttackRange(attacker, target, weapon->getAttackRange())) {
             attacker->performAttack();
             int damage = weapon->getAttackPower();
-            target->takeDamage(damage, weapon);
+            target->takeDamage(damage,type);
             qDebug() << "Melee attack hit for" << damage << "damage!";
         } else {
             // 在范围外，可以播一个挥空的动画，但不开火
@@ -597,14 +597,14 @@ void BattleScene::update() {
     processConsumableDrop();
     // 【新增】添加护甲掉落处理
     processArmorDrop();
-    // 【新增】在帧末尾调用清理函数
-    processDeletions();
     // 【新增】更新护甲UI
     updateArmorDisplays();
     // 更新血条UI
     updateHealthBars();
     // BattleScene的update只需要调用基类的update即可，所有逻辑都在各个process函数里
     Scene::update();
+    // 【新增】在帧末尾调用清理函数
+    processDeletions();
 }
 
 // 新增：武器掉落处理函数
@@ -666,6 +666,19 @@ void BattleScene::processDeletions() {
                 itemsToDelete.append(shotputWeapon);
             }
         }
+
+        // --- 【核心修改】在这里添加对 Rifle 和 SniperRifle 的检查 ---
+        else if (auto* rifle = dynamic_cast<Rifle*>(item)) {
+            if (rifle->isMarkedForDeletion()) {
+                itemsToDelete.append(rifle);
+            }
+        }
+        else if (auto* sniperRifle = dynamic_cast<SniperRifle*>(item)) {
+            if (sniperRifle->isMarkedForDeletion()) {
+                itemsToDelete.append(sniperRifle);
+            }
+        }
+
         // --- 【新增】检查损坏的护甲 ---
         else if (auto* armor = dynamic_cast<Armor*>(item)) {
             if (armor->isMarkedForDeletion()) {

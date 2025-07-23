@@ -93,7 +93,7 @@ public:
     [[nodiscard]] int getMaxHealth() const;
     [[nodiscard]] bool isDead() const;
     void setHealth(int health);
-    void takeDamage(int damage,Weapon* sourceWeapon);
+    void takeDamage(int damage,WeaponType sourceType);
     void heal(int amount);
     
     // 新增：肾上腺素效果系统

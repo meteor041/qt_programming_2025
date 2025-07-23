@@ -4,19 +4,17 @@
 #include <QDebug>
 
 ChainmailArmor::ChainmailArmor(QGraphicsItem *parent)
-    : Armor(parent, ":/ChainmailArmor.png") // 请替换为你的资源路径
+    : Armor(parent, ":/ChainmailArmor.png")
 {
     // 锁子甲没有耐久度概念，但我们可以将其设为-1或一个大数以示区分
     m_durability = -1; // -1 表示无限耐久
     m_maxDurability = -1;
 }
 
-int ChainmailArmor::processDamage(int incomingDamage, Weapon *sourceWeapon) {
-    if (!sourceWeapon) {
-        return incomingDamage; // 如果没有武器来源，则不减免
-    }
+int ChainmailArmor::processDamage(int incomingDamage, WeaponType sourceType) {
 
-    WeaponType type = sourceWeapon->getWeaponType();
+
+    WeaponType type = sourceType;
 
     switch (type) {
     case WeaponType::Fist:

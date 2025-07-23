@@ -23,7 +23,7 @@ public:
     //   - sourceWeapon:   造成伤害的武器指针，用于判断武器类型
     // 返回值：
     //   - 经过护甲减免后，角色应承受的最终伤害
-    virtual int processDamage(int incomingDamage, Weapon* sourceWeapon) = 0;
+    virtual int processDamage(int incomingDamage, WeaponType sourceType) = 0;
 
     // 【新增】获取护甲名称的纯虚函数，用于UI显示
     [[nodiscard]] virtual QString getName() const = 0;

@@ -11,12 +11,10 @@ BulletproofVest::BulletproofVest(QGraphicsItem *parent)
     m_maxDurability = 150;
 }
 
-int BulletproofVest::processDamage(int incomingDamage, Weapon *sourceWeapon) {
-    if (m_isBroken || !sourceWeapon) {
-        return incomingDamage; // 护甲已坏或无武器来源，不减免
-    }
+int BulletproofVest::processDamage(int incomingDamage, WeaponType sourceType) {
 
-    WeaponType type = sourceWeapon->getWeaponType();
+
+    WeaponType type = sourceType;
 
     // 假设防弹衣只对 Rifle 和 SniperRifle 有效
     if (type == WeaponType::Rifle || type == WeaponType::SniperRifle) {

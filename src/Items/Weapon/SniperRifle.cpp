@@ -7,7 +7,7 @@
 
 SniperRifle::SniperRifle(QGraphicsItem *parent)
     // 伤害更高 (50)，弹药更少 (5)，子弹速度更快
-    : Weapon(parent, "50"), ammo(5)
+    : Weapon(parent, "50"), ammo(5),m_markedForDeletion(false)
 {
     if (!pixmapItem) {
         pixmapItem = new QGraphicsPixmapItem(this);
@@ -31,18 +31,25 @@ void SniperRifle::attack(Character *attacker) {
     qDebug() << "Sniper Rifle fired! Ammo left:" << ammo;
 
     if (attacker && attacker->scene()) {
-        // 狙击枪子弹速度更快
-        Bullet* bullet = new Bullet(attacker, this,this->getAttackPower(), 40.0);
-        bullet->setPos(attacker->scenePos() + attacker->boundingRect().center()+QPointF(0, -10));
+        // 【修改】创建子弹时，传递伤害值和武器类型，而不是 this 指针
+        Bullet* bullet = new Bullet(attacker, this->getAttackPower(), this->getWeaponType(), 40.0);
+        bullet->setPos(attacker->scenePos() + attacker->boundingRect().center() + QPointF(0, -10));
         attacker->scene()->addItem(bullet);
     }
 
     if (ammo <= 0) {
         qDebug() << "Sniper Rifle ran out of ammo. Switching to Fist.";
         attacker->setWeapon(new Fist(attacker));
-        if (this->scene()) {
-            this->scene()->removeItem(this);
-        }
-        delete this;
+        this->markForDeletion(); // 这里的操作现在是完全安全的了
     }
+}
+
+
+// 【新增】实现标记和检查方法 (仿照 ShotPut)
+bool SniperRifle::isMarkedForDeletion() const {
+    return m_markedForDeletion;
+}
+
+void SniperRifle::markForDeletion() {
+    m_markedForDeletion = true;
 }
